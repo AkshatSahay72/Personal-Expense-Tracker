@@ -6,7 +6,8 @@ Personal Expense Tracker/
 ├── backend/
 │   ├── database.py
 │   ├── main.py
-│   └── models.py
+│   ├── models.py
+│   └── schemas.py
 ├── .gitignore
 ├── requirements.txt
 └── workflow.md
@@ -19,17 +20,21 @@ Personal Expense Tracker/
 - **Completed Work**: Initialized FastAPI in `backend/main.py` with base roots `/` and `/health`.
 
 ## Milestone 3: Setup SQLite Database Connection (Completed)
-- **Completed Work**: Initialized SQLAlchemy and SQLite configurations in `backend/database.py`.
+- **Completed Work**: Initialized database setups in `backend/database.py`.
 
 ## Milestone 4: Create SQLAlchemy Models (Completed)
+- **Completed Work**: Defined `Expense` table schema in `backend/models.py`.
+
+## Milestone 5: Create Pydantic Schemas (Completed)
 - **Completed Work**:
-  - Created `backend/models.py`.
-  - Defined the `Expense` model corresponding to the `expenses` table.
-  - Configured fields: `id` (integer, PK), `title` (string), `amount` (float), `category` (string), `date` (date), and `notes` (string, optional).
+  - Created `backend/schemas.py`.
+  - Defined standard validation rules for title, amount, date, and category.
+  - Implemented `ExpenseCategory` Enum to restrict inputs to: Food, Shopping, Travel, Bills, Entertainment, and Other.
+  - Built schemas: `ExpenseCreate`, `ExpenseUpdate`, `ExpenseResponse`, and `ExpenseSummaryResponse`.
 - **Remaining Work**:
-  - Milestones 5 to 15 (Pydantic schemas, CRUD operations, backend endpoint setup, frontend design and integrations, Docker containerization, final verification).
+  - Milestones 6 to 15 (CRUD operations, route endpoints, frontend interface development, custom CSS styling, Docker configuration, final deployment validation).
 - **APIs Implemented**:
   - `GET /` - Root welcome message
   - `GET /health` - API health check status
 - **Next Milestone**:
-  - Milestone 5: Create Pydantic schemas (`backend/schemas.py` for request validation and serialization).
+  - Milestone 6: Create CRUD database operations (`backend/crud.py` for CRUD database operations using SQLAlchemy).
