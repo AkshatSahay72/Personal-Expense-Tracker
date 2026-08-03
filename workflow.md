@@ -11,6 +11,7 @@ Personal Expense Tracker/
 │   └── schemas.py
 ├── frontend/
 │   ├── index.html
+│   ├── script.js
 │   └── style.css
 ├── .gitignore
 ├── requirements.txt
@@ -48,12 +49,17 @@ Personal Expense Tracker/
 - **Completed Work**: Added GET `/summary` endpoint for dashboard statistics.
 
 ## Milestone 11: Create Frontend Base Files (Completed)
+- **Completed Work**: Configured static serving structure and created index.html and style.css.
+
+## Milestone 12: Connect Frontend with APIs (Completed)
 - **Completed Work**:
-  - Removed standard welcome message API route `GET /` and instead mounted FastAPI's `StaticFiles(directory="frontend", html=True)` mapping to serve the frontend client at `/`.
-  - Created `frontend/index.html` with grid containers for the dashboard, add/edit form, category list, and transactions log.
-  - Created `frontend/style.css` containing CSS custom property variables, layout alignments, cards, typography, tables, and visual resets.
+  - Created `frontend/script.js` with DOM selectors, page initialization hooks, and helper utils (currency formatter, date formatter, and escape HTML helper).
+  - Coded `fetchExpenses()` to load expenses and build the transactions log table.
+  - Coded `fetchSummary()` to fetch total spending, transactions count, find the top spending category, and load progress bars.
+  - Setup form submit event listener mapping to `handleFormSubmit()` for inserting (`POST`) or updating (`PUT`) expense items.
+  - Implemented row actions handlers: `startEditExpense()` to toggle edit form state and load values, and `deleteExpense()` to trigger deletes.
 - **Remaining Work**:
-  - Milestones 12 to 15 (JavaScript Fetch integration, CSS styling polish, Docker containerization, final validation).
+  - Milestones 13 to 15 (Improve UI/styling adjustments, Docker configuration, final validation and walkthrough).
 - **APIs Implemented**:
   - `GET /health` - API health check status
   - `POST /expenses` - Create a new expense
@@ -63,4 +69,4 @@ Personal Expense Tracker/
   - `GET /summary` - Get spending dashboard summary
   - `/` (Static mount) - Serves the HTML frontend interface
 - **Next Milestone**:
-  - Milestone 12: Connect frontend with APIs (`frontend/script.js` with Fetch requests).
+  - Milestone 13: Improve UI & Aesthetics (enhanced styles, custom category badge colors, smooth transitions/glow, charts, micro-animations).
