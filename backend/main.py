@@ -41,4 +41,25 @@ def read_expenses(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)
     """
     return crud.get_expenses(db=db, skip=skip, limit=limit)
 
+@app.put("/expenses/{expense_id}", response_model=schemas.ExpenseResponse)
+def update_expense(expense_id: int, expense: schemas.ExpenseUpdate, db: Session = Depends(get_db)):
+    """
+    Update an existing expense transaction.
+    """
+    db_expense = crud.get_expense(db, expense_id=expense_id)
+    if db_expense is None:
+        raise HTTPException(status_code=404, detail="Expense not found")
+    return crud.update_expense(db=db, db_expense=db_expense, expense=expense)
+
+@app.delete("/expenses/{expense_id}", response_model=schemas.ExpenseResponse)
+def delete_expense(expense_id: int, db: Session = Depends(get_db)):
+    """
+    Delete an existing expense transaction.
+    """
+    db_expense = crud.get_expense(db, expense_id=expense_id)
+    if db_expense is None:
+        raise HTTPException(status_code=404, detail="Expense not found")
+    return crud.delete_expense(db=db, db_expense=db_expense)
+
+
 

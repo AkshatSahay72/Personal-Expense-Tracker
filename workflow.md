@@ -36,15 +36,21 @@ Personal Expense Tracker/
 - **Completed Work**: Added endpoint `/expenses` to insert a new expense.
 
 ## Milestone 8: Implement GET `/expenses` Endpoint (Completed)
+- **Completed Work**: Added endpoint `/expenses` to fetch all expenses.
+
+## Milestone 9: Implement PUT and DELETE Endpoints (Completed)
 - **Completed Work**:
-  - Added support for returning collections of `ExpenseResponse` schemas via `typing.List`.
-  - Implemented the `GET /expenses` endpoint with optional parameters `skip` and `limit` for pagination.
+  - Implemented the `PUT /expenses/{expense_id}` endpoint to update fields of a specific expense.
+  - Implemented the `DELETE /expenses/{expense_id}` endpoint to remove a specific expense from the database.
+  - Added robust validation to return a `404 Not Found` exception when modifying an expense ID that does not exist.
 - **Remaining Work**:
-  - Milestones 9 to 15 (PUT/DELETE, Summary API endpoints, frontend development, CSS design adjustments, Docker configuration, final verification).
+  - Milestones 10 to 15 (Summary endpoint, frontend design & implementation, CSS additions, Docker configuration, final system validation).
 - **APIs Implemented**:
   - `GET /` - Root welcome message
   - `GET /health` - API health check status
   - `POST /expenses` - Create a new expense
   - `GET /expenses` - Retrieve all expenses
+  - `PUT /expenses/{id}` - Update an existing expense
+  - `DELETE /expenses/{id}` - Delete an existing expense
 - **Next Milestone**:
-  - Milestone 9: Create UPDATE & DELETE endpoints (`PUT /expenses/{id}` and `DELETE /expenses/{id}` in `backend/main.py`).
+  - Milestone 10: Create Summary endpoint (`GET /summary` to aggregate dashboard metrics).
