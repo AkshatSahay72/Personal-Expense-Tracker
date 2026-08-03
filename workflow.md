@@ -13,6 +13,7 @@ Personal Expense Tracker/
 │   ├── index.html
 │   ├── script.js
 │   └── style.css
+├── Dockerfile
 ├── .gitignore
 ├── requirements.txt
 └── workflow.md
@@ -55,14 +56,16 @@ Personal Expense Tracker/
 - **Completed Work**: Integrated script.js fetching and rendering logic.
 
 ## Milestone 13: Improve UI & Aesthetics (Completed)
+- **Completed Work**: Upgraded style.css visual theme, badges, progress fillers, margins, shadows, and interactive animations.
+
+## Milestone 14: Add Dockerfile and Containerization (Completed)
 - **Completed Work**:
-  - Rewrote `frontend/style.css` using custom variables (Radial background, linear brand gradients, HSL colors).
-  - Designed responsive glassmorphic cards using backdrop filtering, borders, and premium shadows.
-  - Implemented category-specific progress bar transitions in script.js by mapping classes like `.fill-food`, `.fill-shopping` to matching HSL color variables.
-  - Custom styled input fields with outline transitions and shadow glows on focus.
-  - Added nice emoji bounce animation and hover scales on dashboard cards and operation buttons.
+  - Created `Dockerfile` using lightweight `python:3.10-slim` as the base image.
+  - Setup environment flags `PYTHONDONTWRITEBYTECODE` and `PYTHONUNBUFFERED` to optimize containerized execution.
+  - Configured workspace directory copy commands to install pip dependencies and pack the `backend/` and `frontend/` directories.
+  - Exposed Port 8000 and mapped container CMD to start Uvicorn serving our FastAPI instance.
 - **Remaining Work**:
-  - Milestones 14 to 15 (Docker containerization, final README and execution validation).
+  - Milestone 15 (README configuration, testing system and final verification check).
 - **APIs Implemented**:
   - `GET /health` - API health check status
   - `POST /expenses` - Create a new expense
@@ -72,4 +75,4 @@ Personal Expense Tracker/
   - `GET /summary` - Get spending dashboard summary
   - `/` (Static mount) - Serves the HTML frontend interface
 - **Next Milestone**:
-  - Milestone 14: Add Dockerfile (`Dockerfile` setup for backend).
+  - Milestone 15: Write README.md and Final Verification (documentation, how to run, and full feature checks).
