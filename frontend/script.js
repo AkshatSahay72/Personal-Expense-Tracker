@@ -130,7 +130,7 @@ function renderCategoryBreakdown(breakdown, totalSpending) {
                 <span>${formatCurrency(amount)} (${percentage}%)</span>
             </div>
             <div class="progress-bar-bg">
-                <div class="progress-bar-fill" style="width: ${percentage}%"></div>
+                <div class="progress-bar-fill fill-${category.toLowerCase()}" style="width: ${percentage}%"></div>
             </div>
         `;
         categoryProgressContainer.appendChild(progressItem);

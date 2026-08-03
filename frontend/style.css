@@ -1,24 +1,48 @@
-/* CSS Reset & Variables */
+/* Design System Variables */
 :root {
-    --bg-primary: #f8fafc;
-    --bg-surface: #ffffff;
+    --bg-app: radial-gradient(circle at 0% 0%, #f1f5f9 0%, #e2e8f0 100%);
+    --bg-surface: rgba(255, 255, 255, 0.8);
+    --bg-surface-solid: #ffffff;
     --text-primary: #0f172a;
-    --text-secondary: #64748b;
+    --text-secondary: #475569;
+    --text-tertiary: #94a3b8;
+    
+    /* Core Branding Gradients */
+    --primary-gradient: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+    --accent-gradient: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    
+    /* Solid Brand Colors */
     --color-primary: #6366f1;
-    --color-primary-hover: #4f46e5;
     --color-accent: #10b981;
-    --color-danger: #ef4444;
-    --color-danger-hover: #dc2626;
-    --border-color: #e2e8f0;
-    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
-    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
-    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
+    --color-danger: #f43f5e;
+    
+    /* Category Colors (HSL for consistency) */
+    --color-food: #f97316;          /* Orange */
+    --color-shopping: #8b5cf6;      /* Violet */
+    --color-travel: #06b6d4;        /* Cyan */
+    --color-bills: #ef4444;         /* Red */
+    --color-entertainment: #ec4899; /* Pink */
+    --color-other: #64748b;         /* Slate */
+    
+    /* Borders & Glassmorphism */
+    --border-color: rgba(226, 232, 240, 0.8);
+    --border-glass: rgba(255, 255, 255, 0.4);
+    
+    /* Shadows */
+    --shadow-soft: 0 4px 20px -2px rgba(15, 23, 42, 0.05), 0 2px 8px -1px rgba(15, 23, 42, 0.03);
+    --shadow-premium: 0 20px 25px -5px rgba(99, 102, 241, 0.1), 0 10px 10px -5px rgba(99, 102, 241, 0.04);
+    --shadow-glow: 0 0 15px rgba(99, 102, 241, 0.25);
+    
+    /* Curves */
     --radius-sm: 8px;
-    --radius-md: 12px;
-    --radius-lg: 16px;
-    --font-sans: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    --radius-md: 14px;
+    --radius-lg: 24px;
+    
+    /* Font */
+    --font-sans: 'Outfit', sans-serif;
 }
 
+/* Base resets & styles */
 * {
     margin: 0;
     padding: 0;
@@ -26,12 +50,14 @@
 }
 
 body {
-    background-color: var(--bg-primary);
+    background: var(--bg-app);
+    background-attachment: fixed;
     color: var(--text-primary);
     font-family: var(--font-sans);
-    line-height: 1.5;
+    line-height: 1.6;
     min-height: 100vh;
-    padding: 2rem 1rem;
+    padding: 3rem 1.5rem;
+    -webkit-font-smoothing: antialiased;
 }
 
 .app-container {
@@ -39,7 +65,7 @@ body {
     margin: 0 auto;
     display: flex;
     flex-direction: column;
-    gap: 2rem;
+    gap: 2.5rem;
 }
 
 /* Header Styles */
@@ -47,8 +73,12 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 1px solid var(--border-color);
-    padding-bottom: 1.5rem;
+    backdrop-filter: blur(10px);
+    background: var(--bg-surface);
+    border: 1px solid var(--border-glass);
+    border-radius: var(--radius-md);
+    padding: 1.5rem 2rem;
+    box-shadow: var(--shadow-soft);
 }
 
 .logo {
@@ -58,22 +88,28 @@ body {
 }
 
 .logo h1 {
-    font-size: 2rem;
-    font-weight: 700;
-    color: var(--color-primary);
+    font-size: 2.25rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    background: var(--primary-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 
 .logo .icon {
-    font-size: 2.25rem;
+    font-size: 2.5rem;
+    animation: bounce 3s infinite;
 }
 
 .subtitle {
     color: var(--text-secondary);
-    font-size: 1rem;
-    font-weight: 500;
+    font-size: 0.95rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
 }
 
-/* Dashboard Summary Cards */
+/* Dashboard Cards Grid */
 .dashboard-summary {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -81,41 +117,79 @@ body {
 }
 
 .summary-card {
-    background-color: var(--bg-surface);
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-md);
-    padding: 1.5rem;
-    box-shadow: var(--shadow-sm);
-    transition: transform 0.2s, box-shadow 0.2s;
+    backdrop-filter: blur(16px);
+    background: var(--bg-surface);
+    border: 1px solid var(--border-glass);
+    border-radius: var(--radius-lg);
+    padding: 2rem;
+    box-shadow: var(--shadow-soft);
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.summary-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: var(--text-tertiary);
+}
+
+.total-spent-card::before {
+    background: var(--primary-gradient);
+}
+
+.transactions-card::before {
+    background: var(--accent-gradient);
+}
+
+.breakdown-card::before {
+    background: linear-gradient(135deg, var(--color-food) 0%, var(--color-shopping) 100%);
 }
 
 .summary-card:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-md);
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-premium);
+    border-color: rgba(99, 102, 241, 0.2);
 }
 
 .summary-card h3 {
-    font-size: 0.875rem;
+    font-size: 0.8rem;
     color: var(--text-secondary);
     text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin-bottom: 0.5rem;
+    letter-spacing: 0.08em;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
 }
 
 .summary-card .amount {
-    font-size: 2.25rem;
-    font-weight: 700;
-    color: var(--color-primary);
+    font-size: 2.5rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    background: var(--primary-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 
-.summary-card .count, 
-.summary-card .category-name {
-    font-size: 2.25rem;
-    font-weight: 700;
+.summary-card .count {
+    font-size: 2.5rem;
+    font-weight: 800;
     color: var(--text-primary);
 }
 
-/* Main Layout Grid */
+.summary-card .category-name {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+/* Layout Content Structure */
 .app-content {
     display: grid;
     grid-template-columns: 1fr;
@@ -124,26 +198,41 @@ body {
 
 @media (min-width: 992px) {
     .app-content {
-        grid-template-columns: 400px 1fr;
+        grid-template-columns: 420px 1fr;
     }
 }
 
 .card {
-    background-color: var(--bg-surface);
-    border: 1px solid var(--border-color);
+    backdrop-filter: blur(16px);
+    background: var(--bg-surface);
+    border: 1px solid var(--border-glass);
     border-radius: var(--radius-lg);
-    padding: 2rem;
-    box-shadow: var(--shadow-md);
+    padding: 2.25rem;
+    box-shadow: var(--shadow-soft);
 }
 
 .card h2 {
-    font-size: 1.25rem;
-    font-weight: 600;
-    margin-bottom: 1.5rem;
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-bottom: 1.75rem;
     color: var(--text-primary);
+    letter-spacing: -0.01em;
+    position: relative;
+    padding-bottom: 0.5rem;
 }
 
-/* Form Styles */
+.card h2::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 40px;
+    height: 3px;
+    background: var(--primary-gradient);
+    border-radius: 99px;
+}
+
+/* Form Styling */
 .form-group {
     display: flex;
     flex-direction: column;
@@ -154,120 +243,174 @@ body {
 .form-group-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 1rem;
+    gap: 1.25rem;
 }
 
 label {
-    font-size: 0.875rem;
-    font-weight: 500;
+    font-size: 0.85rem;
+    font-weight: 600;
     color: var(--text-secondary);
+    letter-spacing: 0.02em;
 }
 
 input, select, textarea {
     width: 100%;
-    padding: 0.75rem 1rem;
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-sm);
+    padding: 0.875rem 1.125rem;
+    border: 1px solid rgba(148, 163, 184, 0.3);
+    border-radius: var(--radius-md);
     font-family: inherit;
     font-size: 0.95rem;
-    background-color: var(--bg-primary);
+    background-color: var(--bg-surface-solid);
     color: var(--text-primary);
     outline: none;
-    transition: border-color 0.2s, box-shadow 0.2s;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 input:focus, select:focus, textarea:focus {
     border-color: var(--color-primary);
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+    box-shadow: var(--shadow-glow);
+    transform: scale(1.01);
 }
 
-/* Buttons */
+textarea {
+    resize: none;
+}
+
+/* Button & Action styling */
 .btn {
     display: inline-flex;
     justify-content: center;
     align-items: center;
-    padding: 0.75rem 1.5rem;
+    padding: 0.875rem 1.75rem;
     font-size: 0.95rem;
-    font-weight: 600;
-    border-radius: var(--radius-sm);
+    font-weight: 700;
+    border-radius: var(--radius-md);
     border: none;
     cursor: pointer;
-    transition: background-color 0.2s, transform 0.1s;
-    width: 100%;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
 }
 
 .btn:active {
-    transform: scale(0.98);
+    transform: scale(0.97);
 }
 
 .btn-primary {
-    background-color: var(--color-primary);
+    background: var(--primary-gradient);
     color: white;
 }
 
 .btn-primary:hover {
-    background-color: var(--color-primary-hover);
+    box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.3), 0 4px 6px -2px rgba(99, 102, 241, 0.1);
+    filter: brightness(1.05);
 }
 
 .btn-secondary {
-    background-color: var(--bg-primary);
+    background: var(--bg-surface-solid);
     color: var(--text-secondary);
-    border: 1px solid var(--border-color);
+    border: 1px solid rgba(148, 163, 184, 0.3);
 }
 
 .btn-secondary:hover {
-    background-color: var(--border-color);
+    background: #f1f5f9;
     color: var(--text-primary);
+    border-color: rgba(148, 163, 184, 0.5);
 }
 
 .form-actions {
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
-    margin-top: 1.5rem;
+    margin-top: 2rem;
 }
 
 .hidden {
     display: none !important;
 }
 
-/* Category Progress Lists */
+/* Category Badges */
+.category-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.35rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* Color Coding for Category Badges */
+.cat-food {
+    background-color: rgba(249, 115, 22, 0.1);
+    color: var(--color-food);
+}
+.cat-shopping {
+    background-color: rgba(139, 92, 246, 0.1);
+    color: var(--color-shopping);
+}
+.cat-travel {
+    background-color: rgba(6, 182, 212, 0.1);
+    color: var(--color-travel);
+}
+.cat-bills {
+    background-color: rgba(239, 68, 68, 0.1);
+    color: var(--color-bills);
+}
+.cat-entertainment {
+    background-color: rgba(236, 72, 153, 0.1);
+    color: var(--color-entertainment);
+}
+.cat-other {
+    background-color: rgba(100, 116, 139, 0.1);
+    color: var(--color-other);
+}
+
+/* Spending Breakdown Progress Trackers */
 .categories-progress-list {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: 1.25rem;
 }
 
 .progress-item {
     display: flex;
     flex-direction: column;
-    gap: 0.25rem;
+    gap: 0.35rem;
 }
 
 .progress-label {
     display: flex;
     justify-content: space-between;
-    font-size: 0.875rem;
-    font-weight: 500;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-secondary);
 }
 
 .progress-bar-bg {
-    background-color: var(--bg-primary);
+    background-color: rgba(148, 163, 184, 0.15);
     border-radius: 9999px;
-    height: 8px;
+    height: 10px;
     width: 100%;
     overflow: hidden;
 }
 
 .progress-bar-fill {
-    background-color: var(--color-primary);
     height: 100%;
     border-radius: 9999px;
     width: 0;
-    transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: width 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-/* List / Table Section */
+/* Specific Progress Bar Fills */
+.fill-food { background-color: var(--color-food); }
+.fill-shopping { background-color: var(--color-shopping); }
+.fill-travel { background-color: var(--color-travel); }
+.fill-bills { background-color: var(--color-bills); }
+.fill-entertainment { background-color: var(--color-entertainment); }
+.fill-other { background-color: var(--color-other); }
+
+/* Table Section & Custom Grid Elements */
 .list-section {
     display: flex;
     flex-direction: column;
@@ -289,17 +432,31 @@ input:focus, select:focus, textarea:focus {
     text-align: left;
 }
 
-.expense-table th, 
-.expense-table td {
-    padding: 1rem;
-    font-size: 0.95rem;
-    border-bottom: 1px solid var(--border-color);
+.expense-table th {
+    font-weight: 700;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-secondary);
+    background-color: rgba(241, 245, 249, 0.6);
+    border-bottom: 2px solid var(--border-color);
+    padding: 1.125rem 1rem;
 }
 
-.expense-table th {
-    font-weight: 600;
-    color: var(--text-secondary);
-    background-color: var(--bg-primary);
+.expense-table td {
+    padding: 1.125rem 1rem;
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-primary);
+    transition: background-color 0.2s;
+}
+
+.expense-table tbody tr {
+    transition: background-color 0.15s;
+}
+
+.expense-table tbody tr:hover {
+    background-color: rgba(99, 102, 241, 0.02);
 }
 
 .actions-col {
@@ -308,20 +465,37 @@ input:focus, select:focus, textarea:focus {
 
 .action-buttons {
     display: flex;
-    gap: 0.5rem;
+    gap: 0.75rem;
     justify-content: flex-end;
 }
 
 .btn-icon {
-    background: none;
-    border: none;
+    background: var(--bg-surface-solid);
+    border: 1px solid rgba(148, 163, 184, 0.2);
     cursor: pointer;
-    font-size: 1.1rem;
-    padding: 0.25rem;
-    border-radius: 4px;
-    transition: background-color 0.2s;
+    font-size: 1rem;
+    padding: 0.45rem;
+    border-radius: var(--radius-sm);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: var(--shadow-sm);
 }
 
 .btn-icon:hover {
     background-color: var(--bg-primary);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.btn-icon:active {
+    transform: translateY(0);
+}
+
+/* Animations */
+@keyframes bounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-6px);
+    }
 }
