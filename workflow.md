@@ -69,11 +69,14 @@ Personal Expense Tracker/
 - **Completed Work**: Setup `.github/workflows/ci.yml` triggering on pushes/PRs to master or main.
 
 ## Milestone 16: Write README.md and Final Verification (Completed)
+- **Completed Work**: Wrote a detailed `README.md` document.
+
+## Improvement A: Replace USD with INR (Completed)
 - **Completed Work**:
-  - Wrote a detailed `README.md` document mapping project features, technology stack, directory structure, API routes definitions table, and local / Docker setup commands.
-  - Completed all code implementation tasks.
+  - Replaced the dollar sign ($) placeholders and labels in `frontend/index.html` with the Rupee symbol (₹).
+  - Modified the javascript currency formatter in `frontend/script.js` to use the `en-IN` local formatting and `INR` currency code to support standard Indian Rupee placement (e.g. ₹1,25,000).
 - **Remaining Work**:
-  - None! All requested project assets are implemented and ready to test.
+  - Improvements B to E (UI redesign, Docker config verify, README directions update, final cleanups).
 - **APIs Implemented**:
   - `GET /health` - API health check status
   - `POST /expenses` - Create a new expense
@@ -83,4 +86,4 @@ Personal Expense Tracker/
   - `GET /summary` - Get spending dashboard summary
   - `/` (Static mount) - Serves the HTML frontend interface
 - **Next Milestone**:
-  - Final delivery and project handover.
+  - Improvement B: Improve Dashboard UI (`style.css` redesign with clean white/gray/blue themes).
