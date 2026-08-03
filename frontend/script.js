@@ -106,8 +106,8 @@ function renderExpensesTable(expenses) {
             </td>
             <td class="actions-col">
                 <div class="action-buttons">
-                    <button type="button" class="btn-icon" onclick="startEditExpense(${expense.id})" title="Edit Expense">✏️</button>
-                    <button type="button" class="btn-icon" onclick="deleteExpense(${expense.id})" title="Delete Expense">🗑️</button>
+                    <button type="button" class="btn-icon" onclick="startEditExpense(${expense.id})" title="Edit Expense">Edit</button>
+                    <button type="button" class="btn-icon" onclick="deleteExpense(${expense.id})" title="Delete Expense" style="color: var(--color-danger); border-color: rgba(220, 38, 38, 0.2);">Delete</button>
                 </div>
             </td>
         </tr>
