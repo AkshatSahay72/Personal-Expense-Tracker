@@ -3,6 +3,9 @@
 ## Current Folder Structure
 ```text
 Personal Expense Tracker/
+├── .github/
+│   └── workflows/
+│       └── ci.yml
 ├── backend/
 │   ├── crud.py
 │   ├── database.py
@@ -59,13 +62,14 @@ Personal Expense Tracker/
 - **Completed Work**: Upgraded style.css visual theme, badges, progress fillers, margins, shadows, and interactive animations.
 
 ## Milestone 14: Add Dockerfile and Containerization (Completed)
+- **Completed Work**: Created Dockerfile using python:3.10-slim.
+
+## Milestone 15: Add GitHub Actions CI workflow (Completed)
 - **Completed Work**:
-  - Created `Dockerfile` using lightweight `python:3.10-slim` as the base image.
-  - Setup environment flags `PYTHONDONTWRITEBYTECODE` and `PYTHONUNBUFFERED` to optimize containerized execution.
-  - Configured workspace directory copy commands to install pip dependencies and pack the `backend/` and `frontend/` directories.
-  - Exposed Port 8000 and mapped container CMD to start Uvicorn serving our FastAPI instance.
+  - Setup `.github/workflows/ci.yml` triggering on pushes/PRs to master or main.
+  - Configured job to check checkout code, setup Python, install pip dependencies, compile python code for syntax validation, and build the Docker container.
 - **Remaining Work**:
-  - Milestone 15 (README configuration, testing system and final verification check).
+  - Milestone 16 (README configuration, testing system and final verification check).
 - **APIs Implemented**:
   - `GET /health` - API health check status
   - `POST /expenses` - Create a new expense
@@ -75,4 +79,4 @@ Personal Expense Tracker/
   - `GET /summary` - Get spending dashboard summary
   - `/` (Static mount) - Serves the HTML frontend interface
 - **Next Milestone**:
-  - Milestone 15: Write README.md and Final Verification (documentation, how to run, and full feature checks).
+  - Milestone 16: Write README.md and Final Verification (documentation, how to run, and full feature checks).
