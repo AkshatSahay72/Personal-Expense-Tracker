@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personal Expense Tracker</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar / Header -->
+        <header class="app-header">
+            <div class="logo">
+                <span class="icon">💰</span>
+                <h1>WealthWise</h1>
+            </div>
+            <p class="subtitle">Personal Expense Tracker</p>
+        </header>
+
+        <!-- Dashboard Summary Grid -->
+        <section class="dashboard-summary">
+            <div class="summary-card total-spent-card">
+                <h3>Total Spending</h3>
+                <p class="amount" id="total-spent">$0.00</p>
+            </div>
+            <div class="summary-card transactions-card">
+                <h3>Transactions</h3>
+                <p class="count" id="transaction-count">0</p>
+            </div>
+            <div class="summary-card breakdown-card">
+                <h3>Top Category</h3>
+                <p class="category-name" id="top-category">N/A</p>
+            </div>
+        </section>
+
+        <!-- Main Workspace -->
+        <main class="app-content">
+            <!-- Left Panel: Form -->
+            <section class="form-section card">
+                <h2 id="form-title">Add New Expense</h2>
+                <form id="expense-form">
+                    <input type="hidden" id="expense-id">
+                    
+                    <div class="form-group">
+                        <label for="title">Expense Title</label>
+                        <input type="text" id="title" required placeholder="e.g. Grocery Shopping">
+                    </div>
+
+                    <div class="form-group-row">
+                        <div class="form-group">
+                            <label for="amount">Amount ($)</label>
+                            <input type="number" id="amount" step="0.01" min="0.01" required placeholder="0.00">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="category">Category</label>
+                            <select id="category" required>
+                                <option value="" disabled selected>Select Category</option>
+                                <option value="Food">Food</option>
+                                <option value="Shopping">Shopping</option>
+                                <option value="Travel">Travel</option>
+                                <option value="Bills">Bills</option>
+                                <option value="Entertainment">Entertainment</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="date">Transaction Date</label>
+                        <input type="date" id="date" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="notes">Notes (Optional)</label>
+                        <textarea id="notes" rows="3" placeholder="Add additional details..."></textarea>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" id="submit-btn" class="btn btn-primary">Save Expense</button>
+                        <button type="button" id="cancel-btn" class="btn btn-secondary hidden">Cancel Edit</button>
+                    </div>
+                </form>
+            </section>
+
+            <!-- Right Panel: Expenses Table & Category Breakdown -->
+            <section class="list-section">
+                <!-- Category Chart/Breakdown Container -->
+                <div class="category-breakdown-panel card">
+                    <h2>Spending by Category</h2>
+                    <div class="categories-progress-list" id="category-progress-container">
+                        <!-- Progress bars will be injected here -->
+                    </div>
+                </div>
+
+                <!-- Transaction Log Table -->
+                <div class="table-container card">
+                    <h2>Transaction Log</h2>
+                    <div class="table-scroll">
+                        <table class="expense-table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Title</th>
+                                    <th>Category</th>
+                                    <th>Amount</th>
+                                    <th>Notes</th>
+                                    <th class="actions-col">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="expense-list">
+                                <!-- Expenses will be injected here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

@@ -9,6 +9,9 @@ Personal Expense Tracker/
 │   ├── main.py
 │   ├── models.py
 │   └── schemas.py
+├── frontend/
+│   ├── index.html
+│   └── style.css
 ├── .gitignore
 ├── requirements.txt
 └── workflow.md
@@ -42,19 +45,22 @@ Personal Expense Tracker/
 - **Completed Work**: Added PUT and DELETE endpoints to update or remove expenses by ID.
 
 ## Milestone 10: Implement GET `/summary` Endpoint (Completed)
+- **Completed Work**: Added GET `/summary` endpoint for dashboard statistics.
+
+## Milestone 11: Create Frontend Base Files (Completed)
 - **Completed Work**:
-  - Implemented the `get_expense_summary` database query in `backend/crud.py` using SQLAlchemy `func.sum` and `func.count` to calculate aggregate metrics.
-  - Implemented the `GET /summary` endpoint in `backend/main.py` which returns the dashboard summary payload.
-  - Ensured all standard categories (Food, Shopping, Travel, Bills, Entertainment, Other) are always present in the dictionary response breakdown, defaulting to `0.0`.
+  - Removed standard welcome message API route `GET /` and instead mounted FastAPI's `StaticFiles(directory="frontend", html=True)` mapping to serve the frontend client at `/`.
+  - Created `frontend/index.html` with grid containers for the dashboard, add/edit form, category list, and transactions log.
+  - Created `frontend/style.css` containing CSS custom property variables, layout alignments, cards, typography, tables, and visual resets.
 - **Remaining Work**:
-  - Milestones 11 to 15 (Frontend file skeletons, JS API connection logic, layout enhancements/styling, Docker containerization, final validation).
+  - Milestones 12 to 15 (JavaScript Fetch integration, CSS styling polish, Docker containerization, final validation).
 - **APIs Implemented**:
-  - `GET /` - Root welcome message
   - `GET /health` - API health check status
   - `POST /expenses` - Create a new expense
   - `GET /expenses` - Retrieve all expenses
   - `PUT /expenses/{id}` - Update an existing expense
   - `DELETE /expenses/{id}` - Delete an existing expense
   - `GET /summary` - Get spending dashboard summary
+  - `/` (Static mount) - Serves the HTML frontend interface
 - **Next Milestone**:
-  - Milestone 11: Create frontend base files (`frontend/index.html` and `frontend/style.css`, and static mount).
+  - Milestone 12: Connect frontend with APIs (`frontend/script.js` with Fetch requests).

@@ -1,5 +1,6 @@
 from typing import List
 from fastapi import FastAPI, Depends, HTTPException, status
+from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
 from backend import crud, models, schemas
 from backend.database import engine, Base, get_db
@@ -12,13 +13,6 @@ app = FastAPI(
     description="A simple FastAPI backend for managing personal expenses",
     version="1.0.0"
 )
-
-@app.get("/")
-def read_root():
-    """
-    Root endpoint to verify the API is running.
-    """
-    return {"message": "Welcome to the Personal Expense Tracker API. Use /docs to view the API documentation."}
 
 @app.get("/health")
 def health_check():
@@ -67,6 +61,10 @@ def read_summary(db: Session = Depends(get_db)):
     Get aggregated dashboard summary metrics (total spending, count, category grouping).
     """
     return crud.get_expense_summary(db=db)
+
+# Mount the static frontend directory to serve the frontend single page app
+app.mount("/", StaticFiles(directory="frontend", html=True), name="frontend")
+
 
 
 
