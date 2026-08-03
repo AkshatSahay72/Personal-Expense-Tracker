@@ -1,4 +1,4 @@
-from datetime import date
+import datetime
 from enum import Enum
 from typing import Optional, Dict
 from pydantic import BaseModel, Field
@@ -21,7 +21,7 @@ class ExpenseBase(BaseModel):
     title: str = Field(..., min_length=1, max_length=100, description="Title of the expense")
     amount: float = Field(..., gt=0, description="Expense amount (must be positive)")
     category: ExpenseCategory = Field(..., description="Category of the expense")
-    date: date = Field(..., description="Date of the expense (YYYY-MM-DD)")
+    date: datetime.date = Field(..., description="Date of the expense (YYYY-MM-DD)")
     notes: Optional[str] = Field(None, max_length=500, description="Optional notes about the expense")
 
 class ExpenseCreate(ExpenseBase):
