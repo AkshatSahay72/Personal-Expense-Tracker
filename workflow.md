@@ -78,12 +78,15 @@ Personal Expense Tracker/
 - **Completed Work**: Redesigned style.css with professional white/gray/blue themes.
 
 ## Improvement C: Fix/Verify Docker Configuration (Completed)
+- **Completed Work**: Verified working directory, COPY instructions, exposed ports, and Uvicorn runtime params in Dockerfile. Tested local container build.
+
+## Improvement D: Fix README Setup Instructions (Completed)
 - **Completed Work**:
-  - Reviewed the `Dockerfile` configuration and verified working directory, COPY instructions, exposed ports, and Uvicorn runtime params.
-  - Added the `aiofiles` dependency to `requirements.txt` to guarantee clean, warnings-free asynchronous static serving inside the container.
-  - Tested the build (`docker build -t expense-tracker .`) and running container (`docker run -d -p 8000:8000 expense-tracker`) on host machine, ensuring it successfully returns healthy API codes.
+  - Rewrote setup guidelines to specify logical setup sequences.
+  - Documented exact virtual environment creation and activation scripts for Windows CMD, Windows PowerShell, and macOS/Linux.
+  - Set the exact requested Docker commands: `docker build -t expense-tracker .` and `docker run -p 8000:8000 expense-tracker` to guarantee port forwards and correct image naming tags.
 - **Remaining Work**:
-  - Improvements D to E (README instructions update, final validation cleanups).
+  - Improvement E (Final cleanup and validation checking).
 - **APIs Implemented**:
   - `GET /health` - API health check status
   - `POST /expenses` - Create a new expense
@@ -93,4 +96,4 @@ Personal Expense Tracker/
   - `GET /summary` - Get spending dashboard summary
   - `/` (Static mount) - Serves the HTML frontend interface
 - **Next Milestone**:
-  - Improvement D: Fix README Setup Instructions (`README.md` update).
+  - Improvement E: Final Project Cleanup and QA Validation (`workflow.md`).
