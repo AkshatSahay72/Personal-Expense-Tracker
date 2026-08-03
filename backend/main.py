@@ -1,3 +1,4 @@
+from typing import List
 from fastapi import FastAPI, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from backend import crud, models, schemas
@@ -32,4 +33,12 @@ def create_expense(expense: schemas.ExpenseCreate, db: Session = Depends(get_db)
     Create a new expense transaction.
     """
     return crud.create_expense(db=db, expense=expense)
+
+@app.get("/expenses", response_model=List[schemas.ExpenseResponse])
+def read_expenses(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+    """
+    Retrieve all expenses with pagination (default newest first).
+    """
+    return crud.get_expenses(db=db, skip=skip, limit=limit)
+
 

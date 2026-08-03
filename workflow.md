@@ -33,14 +33,18 @@ Personal Expense Tracker/
 - **Completed Work**: Created CRUD operations in `backend/crud.py`.
 
 ## Milestone 7: Implement POST `/expenses` Endpoint (Completed)
+- **Completed Work**: Added endpoint `/expenses` to insert a new expense.
+
+## Milestone 8: Implement GET `/expenses` Endpoint (Completed)
 - **Completed Work**:
-  - Integrated SQLite database table creation auto-run on API startup in `backend/main.py`.
-  - Implemented the `POST /expenses` endpoint, taking `ExpenseCreate` request schema and returning `ExpenseResponse` output schema with HTTP 201 status code.
+  - Added support for returning collections of `ExpenseResponse` schemas via `typing.List`.
+  - Implemented the `GET /expenses` endpoint with optional parameters `skip` and `limit` for pagination.
 - **Remaining Work**:
-  - Milestones 8 to 15 (GET, PUT/DELETE, Summary API endpoints, frontend development, custom CSS styling, Docker, final verification).
+  - Milestones 9 to 15 (PUT/DELETE, Summary API endpoints, frontend development, CSS design adjustments, Docker configuration, final verification).
 - **APIs Implemented**:
   - `GET /` - Root welcome message
   - `GET /health` - API health check status
   - `POST /expenses` - Create a new expense
+  - `GET /expenses` - Retrieve all expenses
 - **Next Milestone**:
-  - Milestone 8: Create GET endpoint (`GET /expenses` to fetch all expense records).
+  - Milestone 9: Create UPDATE & DELETE endpoints (`PUT /expenses/{id}` and `DELETE /expenses/{id}` in `backend/main.py`).
