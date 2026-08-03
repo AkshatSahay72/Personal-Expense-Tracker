@@ -1,3 +1,4 @@
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 from backend import models, schemas
 
@@ -51,3 +52,29 @@ def delete_expense(db: Session, db_expense: models.Expense):
     db.delete(db_expense)
     db.commit()
     return db_expense
+
+def get_expense_summary(db: Session):
+    """
+    Calculate summary stats: total spending, count of records, and category breakdown.
+    """
+    total = db.query(func.sum(models.Expense.amount)).scalar() or 0.0
+    count = db.query(func.count(models.Expense.id)).scalar() or 0
+    
+    group_results = db.query(
+        models.Expense.category,
+        func.sum(models.Expense.amount)
+    ).group_by(models.Expense.category).all()
+    
+    breakdown = {category: amount for category, amount in group_results}
+    
+    # Ensure all defined categories exist in the breakdown dictionary
+    for cat in schemas.ExpenseCategory:
+        if cat.value not in breakdown:
+            breakdown[cat.value] = 0.0
+            
+    return {
+        "total_spending": total,
+        "transaction_count": count,
+        "category_breakdown": breakdown
+    }
+

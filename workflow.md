@@ -39,12 +39,15 @@ Personal Expense Tracker/
 - **Completed Work**: Added endpoint `/expenses` to fetch all expenses.
 
 ## Milestone 9: Implement PUT and DELETE Endpoints (Completed)
+- **Completed Work**: Added PUT and DELETE endpoints to update or remove expenses by ID.
+
+## Milestone 10: Implement GET `/summary` Endpoint (Completed)
 - **Completed Work**:
-  - Implemented the `PUT /expenses/{expense_id}` endpoint to update fields of a specific expense.
-  - Implemented the `DELETE /expenses/{expense_id}` endpoint to remove a specific expense from the database.
-  - Added robust validation to return a `404 Not Found` exception when modifying an expense ID that does not exist.
+  - Implemented the `get_expense_summary` database query in `backend/crud.py` using SQLAlchemy `func.sum` and `func.count` to calculate aggregate metrics.
+  - Implemented the `GET /summary` endpoint in `backend/main.py` which returns the dashboard summary payload.
+  - Ensured all standard categories (Food, Shopping, Travel, Bills, Entertainment, Other) are always present in the dictionary response breakdown, defaulting to `0.0`.
 - **Remaining Work**:
-  - Milestones 10 to 15 (Summary endpoint, frontend design & implementation, CSS additions, Docker configuration, final system validation).
+  - Milestones 11 to 15 (Frontend file skeletons, JS API connection logic, layout enhancements/styling, Docker containerization, final validation).
 - **APIs Implemented**:
   - `GET /` - Root welcome message
   - `GET /health` - API health check status
@@ -52,5 +55,6 @@ Personal Expense Tracker/
   - `GET /expenses` - Retrieve all expenses
   - `PUT /expenses/{id}` - Update an existing expense
   - `DELETE /expenses/{id}` - Delete an existing expense
+  - `GET /summary` - Get spending dashboard summary
 - **Next Milestone**:
-  - Milestone 10: Create Summary endpoint (`GET /summary` to aggregate dashboard metrics).
+  - Milestone 11: Create frontend base files (`frontend/index.html` and `frontend/style.css`, and static mount).

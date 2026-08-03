@@ -61,5 +61,13 @@ def delete_expense(expense_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Expense not found")
     return crud.delete_expense(db=db, db_expense=db_expense)
 
+@app.get("/summary", response_model=schemas.ExpenseSummaryResponse)
+def read_summary(db: Session = Depends(get_db)):
+    """
+    Get aggregated dashboard summary metrics (total spending, count, category grouping).
+    """
+    return crud.get_expense_summary(db=db)
+
+
 
 
