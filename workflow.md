@@ -72,11 +72,16 @@ Personal Expense Tracker/
 - **Completed Work**: Wrote a detailed `README.md` document.
 
 ## Improvement A: Replace USD with INR (Completed)
+- **Completed Work**: Replaced the dollar sign ($) placeholders and formatting with Rupee symbol (₹) and Indian standard number layouts.
+
+## Improvement B: Improve Dashboard UI (Completed)
 - **Completed Work**:
-  - Replaced the dollar sign ($) placeholders and labels in `frontend/index.html` with the Rupee symbol (₹).
-  - Modified the javascript currency formatter in `frontend/script.js` to use the `en-IN` local formatting and `INR` currency code to support standard Indian Rupee placement (e.g. ₹1,25,000).
+  - Rewrote `frontend/style.css` to transition from an AI-like glassmorphic look to a clean, professional, student-level software application dashboard.
+  - Removed huge backgrounds, neon accents, background blurs, bounce animations, hover scales, and heavy shadows.
+  - Set a clean slate background `#f8fafc` and white card containers with simple `#e2e8f0` borders.
+  - Applied the standard brand color `#2563eb` (primary blue) with consistent hovers, borders, muted colors, and compact line tables.
 - **Remaining Work**:
-  - Improvements B to E (UI redesign, Docker config verify, README directions update, final cleanups).
+  - Improvements C to E (Docker config verify, README update, final cleanups).
 - **APIs Implemented**:
   - `GET /health` - API health check status
   - `POST /expenses` - Create a new expense
@@ -86,4 +91,4 @@ Personal Expense Tracker/
   - `GET /summary` - Get spending dashboard summary
   - `/` (Static mount) - Serves the HTML frontend interface
 - **Next Milestone**:
-  - Improvement B: Improve Dashboard UI (`style.css` redesign with clean white/gray/blue themes).
+  - Improvement C: Fix/Verify Docker Configuration (`Dockerfile`).
