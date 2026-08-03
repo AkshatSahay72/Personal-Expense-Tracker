@@ -60,13 +60,13 @@ Personal Expense Tracker/
 - **Completed Work**: Integrated script.js fetching and rendering logic.
 
 ## Milestone 13: Improve UI & Aesthetics (Completed)
-- **Completed Work**: Upgraded style.css visual theme, badges, progress fillers, margins, shadows, and interactive animations.
+- **Completed Work**: Upgraded style.css visual theme.
 
 ## Milestone 14: Add Dockerfile and Containerization (Completed)
 - **Completed Work**: Created Dockerfile using python:3.10-slim.
 
 ## Milestone 15: Add GitHub Actions CI workflow (Completed)
-- **Completed Work**: Setup `.github/workflows/ci.yml` triggering on pushes/PRs to master or main.
+- **Completed Work**: Setup `.github/workflows/ci.yml` triggering on pushes/PRs.
 
 ## Milestone 16: Write README.md and Final Verification (Completed)
 - **Completed Work**: Wrote a detailed `README.md` document.
@@ -75,13 +75,15 @@ Personal Expense Tracker/
 - **Completed Work**: Replaced the dollar sign ($) placeholders and formatting with Rupee symbol (₹) and Indian standard number layouts.
 
 ## Improvement B: Improve Dashboard UI (Completed)
+- **Completed Work**: Redesigned style.css with professional white/gray/blue themes.
+
+## Improvement C: Fix/Verify Docker Configuration (Completed)
 - **Completed Work**:
-  - Rewrote `frontend/style.css` to transition from an AI-like glassmorphic look to a clean, professional, student-level software application dashboard.
-  - Removed huge backgrounds, neon accents, background blurs, bounce animations, hover scales, and heavy shadows.
-  - Set a clean slate background `#f8fafc` and white card containers with simple `#e2e8f0` borders.
-  - Applied the standard brand color `#2563eb` (primary blue) with consistent hovers, borders, muted colors, and compact line tables.
+  - Reviewed the `Dockerfile` configuration and verified working directory, COPY instructions, exposed ports, and Uvicorn runtime params.
+  - Added the `aiofiles` dependency to `requirements.txt` to guarantee clean, warnings-free asynchronous static serving inside the container.
+  - Tested the build (`docker build -t expense-tracker .`) and running container (`docker run -d -p 8000:8000 expense-tracker`) on host machine, ensuring it successfully returns healthy API codes.
 - **Remaining Work**:
-  - Improvements C to E (Docker config verify, README update, final cleanups).
+  - Improvements D to E (README instructions update, final validation cleanups).
 - **APIs Implemented**:
   - `GET /health` - API health check status
   - `POST /expenses` - Create a new expense
@@ -91,4 +93,4 @@ Personal Expense Tracker/
   - `GET /summary` - Get spending dashboard summary
   - `/` (Static mount) - Serves the HTML frontend interface
 - **Next Milestone**:
-  - Improvement C: Fix/Verify Docker Configuration (`Dockerfile`).
+  - Improvement D: Fix README Setup Instructions (`README.md` update).
