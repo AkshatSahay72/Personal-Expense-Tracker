@@ -4,6 +4,7 @@
 ```text
 Personal Expense Tracker/
 ├── backend/
+│   ├── crud.py
 │   ├── database.py
 │   ├── main.py
 │   ├── models.py
@@ -26,15 +27,16 @@ Personal Expense Tracker/
 - **Completed Work**: Defined `Expense` table schema in `backend/models.py`.
 
 ## Milestone 5: Create Pydantic Schemas (Completed)
+- **Completed Work**: Created Pydantic schemas in `backend/schemas.py`.
+
+## Milestone 6: Create CRUD Database Operations (Completed)
 - **Completed Work**:
-  - Created `backend/schemas.py`.
-  - Defined standard validation rules for title, amount, date, and category.
-  - Implemented `ExpenseCategory` Enum to restrict inputs to: Food, Shopping, Travel, Bills, Entertainment, and Other.
-  - Built schemas: `ExpenseCreate`, `ExpenseUpdate`, `ExpenseResponse`, and `ExpenseSummaryResponse`.
+  - Created `backend/crud.py`.
+  - Implemented database query and commit operations: `get_expense`, `get_expenses` (with newest first order), `create_expense`, `update_expense`, and `delete_expense`.
 - **Remaining Work**:
-  - Milestones 6 to 15 (CRUD operations, route endpoints, frontend interface development, custom CSS styling, Docker configuration, final deployment validation).
+  - Milestones 7 to 15 (POST endpoint, GET endpoint, PUT/DELETE endpoints, Summary endpoint, frontend implementation and styling, Docker configurations, README and walkthrough verification).
 - **APIs Implemented**:
   - `GET /` - Root welcome message
   - `GET /health` - API health check status
 - **Next Milestone**:
-  - Milestone 6: Create CRUD database operations (`backend/crud.py` for CRUD database operations using SQLAlchemy).
+  - Milestone 7: Create POST endpoint (`POST /expenses` in `backend/main.py` to create a new expense).
