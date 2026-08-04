@@ -23,15 +23,24 @@
         <!-- Dashboard Summary Grid -->
         <section class="dashboard-summary">
             <div class="summary-card total-spent-card">
-                <h3>Total Spending</h3>
+                <div class="summary-header">
+                    <h3>Total Spending</h3>
+                    <div class="summary-icon icon-spent">₹</div>
+                </div>
                 <p class="amount" id="total-spent">₹0.00</p>
             </div>
             <div class="summary-card transactions-card">
-                <h3>Transactions</h3>
+                <div class="summary-header">
+                    <h3>Transactions</h3>
+                    <div class="summary-icon icon-count">#</div>
+                </div>
                 <p class="count" id="transaction-count">0</p>
             </div>
             <div class="summary-card breakdown-card">
-                <h3>Top Category</h3>
+                <div class="summary-header">
+                    <h3>Top Category</h3>
+                    <div class="summary-icon icon-top">★</div>
+                </div>
                 <p class="category-name" id="top-category">N/A</p>
             </div>
         </section>
@@ -118,7 +127,57 @@
                     </div>
                 </div>
             </section>
-        </main>
+    <!-- Edit Expense Modal Popup -->
+    <div class="modal-overlay hidden" id="edit-modal-overlay">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h2>Edit Expense</h2>
+                <button type="button" class="modal-close" id="close-modal-btn" aria-label="Close Modal">&times;</button>
+            </div>
+            <form id="edit-expense-form">
+                <input type="hidden" id="edit-expense-id">
+                
+                <div class="form-group">
+                    <label for="edit-title">Expense Title</label>
+                    <input type="text" id="edit-title" required placeholder="e.g. Grocery Shopping">
+                </div>
+
+                <div class="form-group-row">
+                    <div class="form-group">
+                        <label for="edit-amount">Amount (₹)</label>
+                        <input type="number" id="edit-amount" step="0.01" min="0.01" required placeholder="0.00">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="edit-category">Category</label>
+                        <select id="edit-category" required>
+                            <option value="" disabled>Select Category</option>
+                            <option value="Food">Food</option>
+                            <option value="Shopping">Shopping</option>
+                            <option value="Travel">Travel</option>
+                            <option value="Bills">Bills</option>
+                            <option value="Entertainment">Entertainment</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="edit-date">Transaction Date</label>
+                    <input type="date" id="edit-date" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="edit-notes">Notes (Optional)</label>
+                    <textarea id="edit-notes" rows="3" placeholder="Add additional details..."></textarea>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" id="edit-cancel-btn">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Update Expense</button>
+                </div>
+            </form>
+        </div>
     </div>
 
     <script src="script.js"></script>
