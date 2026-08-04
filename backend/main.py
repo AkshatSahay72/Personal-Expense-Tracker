@@ -58,9 +58,23 @@ def delete_expense(expense_id: int, db: Session = Depends(get_db)):
 @app.get("/summary", response_model=schemas.ExpenseSummaryResponse)
 def read_summary(db: Session = Depends(get_db)):
     """
-    Get aggregated dashboard summary metrics (total spending, count, category grouping).
+    Get aggregated dashboard summary metrics (total spending, count, category grouping, monthly budget).
     """
     return crud.get_expense_summary(db=db)
+
+@app.get("/budget", response_model=schemas.BudgetResponse)
+def read_budget(db: Session = Depends(get_db)):
+    """
+    Get current monthly budget limit target.
+    """
+    return crud.get_budget(db=db)
+
+@app.put("/budget", response_model=schemas.BudgetResponse)
+def update_budget(budget: schemas.BudgetUpdate, db: Session = Depends(get_db)):
+    """
+    Update monthly budget limit target.
+    """
+    return crud.set_budget(db=db, monthly_limit=budget.monthly_limit)
 
 # Mount the static frontend directory to serve the frontend single page app
 app.mount("/", StaticFiles(directory="frontend", html=True), name="frontend")
