@@ -217,6 +217,24 @@
         </div>
     </div>
 
+    <!-- Delete Expense Confirmation Modal Popup -->
+    <div class="modal-overlay hidden" id="delete-modal-overlay">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h2>Delete Expense</h2>
+                <button type="button" class="modal-close" id="close-delete-modal-btn" aria-label="Close Modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p class="delete-warning-text">Are you sure you want to delete <strong id="delete-expense-title">this expense</strong>?</p>
+                <p class="delete-subtext" style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.25rem;">This action cannot be undone.</p>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-secondary" id="cancel-delete-modal-btn">Cancel</button>
+                <button type="button" class="btn btn-danger" id="confirm-delete-btn">Delete Expense</button>
+            </div>
+        </div>
+    </div>
+
     <script src="script.js"></script>
 </body>
 </html>
