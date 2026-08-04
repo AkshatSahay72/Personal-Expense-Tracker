@@ -37,11 +37,19 @@ const monthlyBudgetInput = document.getElementById('monthly-budget-input');
 const closeBudgetModalBtn = document.getElementById('close-budget-modal-btn');
 const cancelBudgetModalBtn = document.getElementById('cancel-budget-modal-btn');
 
+// DOM Elements - Delete Modal
+const deleteModalOverlay = document.getElementById('delete-modal-overlay');
+const deleteExpenseTitleEl = document.getElementById('delete-expense-title');
+const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
+const closeDeleteModalBtn = document.getElementById('close-delete-modal-btn');
+const cancelDeleteModalBtn = document.getElementById('cancel-delete-modal-btn');
+
 // API Base URL
 const API_BASE = '';
 
 // App State
 let allExpenses = [];
+let pendingDeleteId = null;
 
 // Initialize Page
 document.addEventListener('DOMContentLoaded', () => {
@@ -63,6 +71,10 @@ document.addEventListener('DOMContentLoaded', () => {
     openBudgetModalBtn.addEventListener('click', openBudgetModal);
     closeBudgetModalBtn.addEventListener('click', closeBudgetModal);
     cancelBudgetModalBtn.addEventListener('click', closeBudgetModal);
+
+    closeDeleteModalBtn.addEventListener('click', closeDeleteModal);
+    cancelDeleteModalBtn.addEventListener('click', closeDeleteModal);
+    confirmDeleteBtn.addEventListener('click', handleConfirmDelete);
     
     // Close modal when clicking on overlay background
     editModalOverlay.addEventListener('click', (e) => {
@@ -73,11 +85,16 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.target === budgetModalOverlay) closeBudgetModal();
     });
 
+    deleteModalOverlay.addEventListener('click', (e) => {
+        if (e.target === deleteModalOverlay) closeDeleteModal();
+    });
+
     // Close modal on Escape key
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
             if (editModalOverlay && !editModalOverlay.classList.contains('hidden')) closeEditModal();
             if (budgetModalOverlay && !budgetModalOverlay.classList.contains('hidden')) closeBudgetModal();
+            if (deleteModalOverlay && !deleteModalOverlay.classList.contains('hidden')) closeDeleteModal();
         }
     });
 });
@@ -341,24 +358,39 @@ async function handleBudgetFormSubmit(e) {
     }
 }
 
-// Delete Expense
-window.deleteExpense = async function(id) {
-    if (!confirm('Are you sure you want to delete this expense?')) return;
+// Trigger Delete Confirmation Modal
+window.deleteExpense = function(id) {
+    const expense = allExpenses.find(exp => String(exp.id) === String(id));
+    pendingDeleteId = id;
+    deleteExpenseTitleEl.textContent = expense ? `"${expense.title}"` : 'this expense';
+    deleteModalOverlay.classList.remove('hidden');
+};
+
+// Close Delete Modal
+function closeDeleteModal() {
+    deleteModalOverlay.classList.add('hidden');
+    pendingDeleteId = null;
+}
+
+// Handle Confirm Delete
+async function handleConfirmDelete() {
+    if (!pendingDeleteId) return;
     
     try {
-        const response = await fetch(`${API_BASE}/expenses/${id}`, {
+        const response = await fetch(`${API_BASE}/expenses/${pendingDeleteId}`, {
             method: 'DELETE'
         });
         
         if (!response.ok) throw new Error('Failed to delete expense');
         
+        closeDeleteModal();
         await loadDashboard();
         
     } catch (error) {
         alert(`Error deleting expense: ${error.message}`);
         console.error(error);
     }
-};
+}
 
 // Reset Add Form
 function resetAddForm() {
