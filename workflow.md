@@ -86,7 +86,7 @@ Personal Expense Tracker/
   - Documented exact virtual environment creation and activation scripts for Windows CMD, Windows PowerShell, and macOS/Linux.
   - Set the exact requested Docker commands: `docker build -t expense-tracker .` and `docker run -p 8000:8000 expense-tracker` to guarantee port forwards and correct image naming tags.
 - **Remaining Work**:
-  - Improvement E (Final cleanup and validation checking).
+  - None (All core milestones and improvements completed).
 - **APIs Implemented**:
   - `GET /health` - API health check status
   - `POST /expenses` - Create a new expense
@@ -96,4 +96,11 @@ Personal Expense Tracker/
   - `GET /summary` - Get spending dashboard summary
   - `/` (Static mount) - Serves the HTML frontend interface
 - **Next Milestone**:
-  - Improvement E: Final Project Cleanup and QA Validation (`workflow.md`).
+  - Ready for final review, testing, and deployment to production on Render.com.
+
+## Improvement E: Make Application Render-Friendly (Completed)
+- **Completed Work**:
+  - Configured custom database directory lookup via `DATABASE_DIR` env variable in `backend/database.py` for persistent SQLite volumes.
+  - Wrapped Dockerfile `CMD` to dynamically listen on Render's dynamic `$PORT` assignment.
+  - Created `render.yaml` configuration for one-click blueprint deployments.
+  - Added comprehensive step-by-step instructions to `README.md` for Free Tier, Persistent Paid Tier, and Docker-based Render deployments.

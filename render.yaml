@@ -1,0 +1,19 @@
+services:
+  # Python-based deployment (Recommended for simple setup and Free Tier availability)
+  - type: web
+    name: wealthwise-expense-tracker
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn backend.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.10.12
+      - key: DATABASE_DIR
+        value: /var/data
+    # Attach a persistent disk to maintain the SQLite database between redeploys.
+    # Note: Persistent Disks are only available on Render's paid services. 
+    # If deploying on the Free Tier, remove the 'disk' configuration below.
+    disk:
+      name: expense-db-volume
+      mountPath: /var/data
+      sizeGB: 1

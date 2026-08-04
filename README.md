@@ -91,6 +91,44 @@ You can build and run the application in a sandboxed Docker container using the 
 
 ---
 
+## Render Deployment
+
+This application is configured for seamless deployment on **Render.com** (as a Web Service) using the root `render.yaml` blueprint configuration or manually via the Render dashboard.
+
+### Option A: Manual Setup (Render Free Tier)
+
+1. Create a new **Web Service** on Render and connect your GitHub repository.
+2. Select **Python** as the Environment.
+3. Configure the following settings:
+   - **Build Command**: `pip install -r requirements.txt`
+   - **Start Command**: `uvicorn backend.main:app --host 0.0.0.0 --port $PORT`
+4. Click **Deploy**. Render will automatically provision a URL for your application.
+   > [!NOTE]
+   > On the Free Tier, the SQLite database is ephemeral and will reset when the service restarts or spins down due to inactivity.
+
+### Option B: Persistent Disk Setup (Render Paid Tier)
+
+To persist your database across restarts and deployments:
+1. Create a new **Web Service** using the Python environment.
+2. In the service's **Advanced Settings**:
+   - Add a **Disk**:
+     - **Name**: `expense-data`
+     - **Mount Path**: `/var/data`
+     - **Size**: `1 GB`
+   - Add an **Environment Variable**:
+     - **Key**: `DATABASE_DIR`
+     - **Value**: `/var/data`
+3. Deploy the service. The SQLite database `expenses.db` will now be safely stored on the persistent disk at `/var/data/expenses.db`.
+
+### Option C: Docker-based Deployment
+
+You can also deploy the application using the included `Dockerfile`:
+1. Create a new **Web Service** and choose **Docker** as the runtime.
+2. Add a persistent disk at `/var/data` and configure `DATABASE_DIR=/var/data` under the environment variables if persistence is required.
+3. Deploy the service. Render will build and run the Docker container, dynamically mapping the external port using the `$PORT` environment variable handled in the Dockerfile command wrapper.
+
+---
+
 ## API Documentation
 
 The backend exposes the following RESTful API routes:
