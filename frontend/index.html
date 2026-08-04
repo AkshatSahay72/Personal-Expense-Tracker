@@ -43,6 +43,22 @@
                 </div>
                 <p class="category-name" id="top-category">N/A</p>
             </div>
+            <div class="summary-card budget-card">
+                <div class="summary-header">
+                    <h3>Monthly Budget</h3>
+                    <button type="button" class="btn-edit-budget" id="open-budget-modal-btn" title="Set Target">Set Limit</button>
+                </div>
+                <div class="budget-values">
+                    <span class="amount-spent" id="month-spent">₹0.00</span>
+                    <span class="budget-limit-text">/ <span id="budget-limit">₹30,000</span></span>
+                </div>
+                <div class="budget-progress-container">
+                    <div class="budget-progress-bar">
+                        <div class="budget-progress-fill" id="budget-progress-fill" style="width: 0%;"></div>
+                    </div>
+                    <span class="budget-status-badge badge-healthy" id="budget-status-badge">0%</span>
+                </div>
+            </div>
         </section>
 
         <!-- Main Workspace -->
@@ -175,6 +191,27 @@
                 <div class="modal-actions">
                     <button type="button" class="btn btn-secondary" id="edit-cancel-btn">Cancel</button>
                     <button type="submit" class="btn btn-primary">Update Expense</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Set Budget Modal Popup -->
+    <div class="modal-overlay hidden" id="budget-modal-overlay">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h2>Set Monthly Budget Target</h2>
+                <button type="button" class="modal-close" id="close-budget-modal-btn" aria-label="Close Modal">&times;</button>
+            </div>
+            <form id="budget-form">
+                <div class="form-group">
+                    <label for="monthly-budget-input">Monthly Limit Target (₹)</label>
+                    <input type="number" id="monthly-budget-input" step="100" min="0" required placeholder="e.g. 30000">
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" id="cancel-budget-modal-btn">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Target</button>
                 </div>
             </form>
         </div>
