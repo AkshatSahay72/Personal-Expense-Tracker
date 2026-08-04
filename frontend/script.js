@@ -25,6 +25,18 @@ const transactionCountEl = document.getElementById('transaction-count');
 const topCategoryEl = document.getElementById('top-category');
 const categoryProgressContainer = document.getElementById('category-progress-container');
 
+// DOM Elements - Budget Modal & Display
+const monthSpentEl = document.getElementById('month-spent');
+const budgetLimitEl = document.getElementById('budget-limit');
+const budgetProgressFill = document.getElementById('budget-progress-fill');
+const budgetStatusBadge = document.getElementById('budget-status-badge');
+const openBudgetModalBtn = document.getElementById('open-budget-modal-btn');
+const budgetModalOverlay = document.getElementById('budget-modal-overlay');
+const budgetForm = document.getElementById('budget-form');
+const monthlyBudgetInput = document.getElementById('monthly-budget-input');
+const closeBudgetModalBtn = document.getElementById('close-budget-modal-btn');
+const cancelBudgetModalBtn = document.getElementById('cancel-budget-modal-btn');
+
 // API Base URL
 const API_BASE = '';
 
@@ -43,19 +55,29 @@ document.addEventListener('DOMContentLoaded', () => {
     // Setup event listeners
     expenseForm.addEventListener('submit', handleAddFormSubmit);
     editExpenseForm.addEventListener('submit', handleEditFormSubmit);
+    budgetForm.addEventListener('submit', handleBudgetFormSubmit);
     
     closeModalBtn.addEventListener('click', closeEditModal);
     editCancelBtn.addEventListener('click', closeEditModal);
+    
+    openBudgetModalBtn.addEventListener('click', openBudgetModal);
+    closeBudgetModalBtn.addEventListener('click', closeBudgetModal);
+    cancelBudgetModalBtn.addEventListener('click', closeBudgetModal);
     
     // Close modal when clicking on overlay background
     editModalOverlay.addEventListener('click', (e) => {
         if (e.target === editModalOverlay) closeEditModal();
     });
 
+    budgetModalOverlay.addEventListener('click', (e) => {
+        if (e.target === budgetModalOverlay) closeBudgetModal();
+    });
+
     // Close modal on Escape key
     document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && editModalOverlay && !editModalOverlay.classList.contains('hidden')) {
-            closeEditModal();
+        if (e.key === 'Escape') {
+            if (editModalOverlay && !editModalOverlay.classList.contains('hidden')) closeEditModal();
+            if (budgetModalOverlay && !budgetModalOverlay.classList.contains('hidden')) closeBudgetModal();
         }
     });
 });
@@ -103,6 +125,32 @@ async function fetchSummary() {
         
         topCategoryEl.textContent = topCategory !== 'N/A' ? `${topCategory} (${formatCurrency(maxAmount)})` : 'N/A';
         
+        // Update Monthly Budget Metrics
+        if (monthSpentEl && budgetLimitEl && budgetProgressFill && budgetStatusBadge) {
+            monthSpentEl.textContent = formatCurrency(summary.current_month_spending || 0);
+            budgetLimitEl.textContent = formatCurrency(summary.monthly_budget || 30000);
+            
+            const pct = summary.budget_percentage_used || 0;
+            budgetStatusBadge.textContent = `${pct}%`;
+            
+            const fillWidth = Math.min(pct, 100);
+            budgetProgressFill.style.width = `${fillWidth}%`;
+            
+            budgetStatusBadge.className = 'budget-status-badge ';
+            budgetProgressFill.className = 'budget-progress-fill ';
+            
+            if (pct < 75) {
+                budgetStatusBadge.classList.add('badge-healthy');
+                budgetProgressFill.classList.add('fill-healthy');
+            } else if (pct <= 90) {
+                budgetStatusBadge.classList.add('badge-caution');
+                budgetProgressFill.classList.add('fill-caution');
+            } else {
+                budgetStatusBadge.classList.add('badge-alert');
+                budgetProgressFill.classList.add('fill-alert');
+            }
+        }
+
         // Render category breakdown progress bars
         renderCategoryBreakdown(summary.category_breakdown, summary.total_spending);
         
@@ -253,6 +301,42 @@ async function handleEditFormSubmit(e) {
         
     } catch (error) {
         alert(`Error updating expense: ${error.message}`);
+        console.error(error);
+    }
+}
+
+// Open Budget Modal
+function openBudgetModal() {
+    const currentLimitStr = budgetLimitEl.textContent.replace(/[^0-9.]/g, '');
+    monthlyBudgetInput.value = currentLimitStr || 30000;
+    budgetModalOverlay.classList.remove('hidden');
+}
+
+// Close Budget Modal
+function closeBudgetModal() {
+    budgetModalOverlay.classList.add('hidden');
+    budgetForm.reset();
+}
+
+// Handle Budget Form Submit (PUT /budget)
+async function handleBudgetFormSubmit(e) {
+    e.preventDefault();
+    const newLimit = parseFloat(monthlyBudgetInput.value);
+    if (isNaN(newLimit) || newLimit <= 0) return;
+    
+    try {
+        const response = await fetch(`${API_BASE}/budget`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ monthly_limit: newLimit })
+        });
+        
+        if (!response.ok) throw new Error('Failed to update budget limit');
+        
+        closeBudgetModal();
+        await loadDashboard();
+    } catch (error) {
+        alert(`Error updating budget: ${error.message}`);
         console.error(error);
     }
 }
