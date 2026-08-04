@@ -113,18 +113,18 @@ To persist your database across restarts and deployments:
 2. In the service's **Advanced Settings**:
    - Add a **Disk**:
      - **Name**: `expense-data`
-     - **Mount Path**: `/var/data`
+     - **Mount Path**: `/app/data`
      - **Size**: `1 GB`
    - Add an **Environment Variable**:
      - **Key**: `DATABASE_DIR`
-     - **Value**: `/var/data`
-3. Deploy the service. The SQLite database `expenses.db` will now be safely stored on the persistent disk at `/var/data/expenses.db`.
+     - **Value**: `/app/data`
+3. Deploy the service. The SQLite database `expenses.db` will now be safely stored on the persistent disk at `/app/data/expenses.db`.
 
 ### Option C: Docker-based Deployment
 
 You can also deploy the application using the included `Dockerfile`:
 1. Create a new **Web Service** and choose **Docker** as the runtime.
-2. Add a persistent disk at `/var/data` and configure `DATABASE_DIR=/var/data` under the environment variables if persistence is required.
+2. Add a persistent disk at `/app/data` and configure `DATABASE_DIR=/app/data` under the environment variables if persistence is required.
 3. Deploy the service. Render will build and run the Docker container, dynamically mapping the external port using the `$PORT` environment variable handled in the Dockerfile command wrapper.
 
 ---
