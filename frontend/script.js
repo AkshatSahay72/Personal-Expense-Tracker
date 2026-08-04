@@ -1,23 +1,31 @@
-// DOM Elements
+// DOM Elements - Main Form
 const expenseForm = document.getElementById('expense-form');
-const expenseIdInput = document.getElementById('expense-id');
 const titleInput = document.getElementById('title');
 const amountInput = document.getElementById('amount');
 const categoryInput = document.getElementById('category');
 const dateInput = document.getElementById('date');
 const notesInput = document.getElementById('notes');
 
-const formTitle = document.getElementById('form-title');
-const submitBtn = document.getElementById('submit-btn');
-const cancelBtn = document.getElementById('cancel-btn');
+// DOM Elements - Edit Modal
+const editModalOverlay = document.getElementById('edit-modal-overlay');
+const editExpenseForm = document.getElementById('edit-expense-form');
+const editExpenseIdInput = document.getElementById('edit-expense-id');
+const editTitleInput = document.getElementById('edit-title');
+const editAmountInput = document.getElementById('edit-amount');
+const editCategoryInput = document.getElementById('edit-category');
+const editDateInput = document.getElementById('edit-date');
+const editNotesInput = document.getElementById('edit-notes');
+const closeModalBtn = document.getElementById('close-modal-btn');
+const editCancelBtn = document.getElementById('edit-cancel-btn');
 
+// Dashboard Display Elements
 const expenseList = document.getElementById('expense-list');
 const totalSpentEl = document.getElementById('total-spent');
 const transactionCountEl = document.getElementById('transaction-count');
 const topCategoryEl = document.getElementById('top-category');
 const categoryProgressContainer = document.getElementById('category-progress-container');
 
-// API Base URL (empty string since frontend is served from the same origin)
+// API Base URL
 const API_BASE = '';
 
 // App State
@@ -33,8 +41,23 @@ document.addEventListener('DOMContentLoaded', () => {
     loadDashboard();
     
     // Setup event listeners
-    expenseForm.addEventListener('submit', handleFormSubmit);
-    cancelBtn.addEventListener('click', resetForm);
+    expenseForm.addEventListener('submit', handleAddFormSubmit);
+    editExpenseForm.addEventListener('submit', handleEditFormSubmit);
+    
+    closeModalBtn.addEventListener('click', closeEditModal);
+    editCancelBtn.addEventListener('click', closeEditModal);
+    
+    // Close modal when clicking on overlay background
+    editModalOverlay.addEventListener('click', (e) => {
+        if (e.target === editModalOverlay) closeEditModal();
+    });
+
+    // Close modal on Escape key
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && editModalOverlay && !editModalOverlay.classList.contains('hidden')) {
+            closeEditModal();
+        }
+    });
 });
 
 // Load all dashboard components
@@ -48,7 +71,7 @@ async function fetchExpenses() {
     try {
         const response = await fetch(`${API_BASE}/expenses`);
         if (!response.ok) throw new Error('Failed to fetch expenses');
-        allExpenses = await response.ok ? await response.json() : [];
+        allExpenses = await response.json();
         renderExpensesTable(allExpenses);
     } catch (error) {
         console.error('Error fetching expenses:', error);
@@ -106,8 +129,8 @@ function renderExpensesTable(expenses) {
             </td>
             <td class="actions-col">
                 <div class="action-buttons">
-                    <button type="button" class="btn-icon" onclick="startEditExpense(${expense.id})" title="Edit Expense">Edit</button>
-                    <button type="button" class="btn-icon" onclick="deleteExpense(${expense.id})" title="Delete Expense" style="color: var(--color-danger); border-color: rgba(220, 38, 38, 0.2);">Delete</button>
+                    <button type="button" class="btn-action-edit" onclick="startEditExpense(${expense.id})" title="Edit Expense">Edit</button>
+                    <button type="button" class="btn-action-delete" onclick="deleteExpense(${expense.id})" title="Delete Expense">Delete</button>
                 </div>
             </td>
         </tr>
@@ -119,7 +142,6 @@ function renderCategoryBreakdown(breakdown, totalSpending) {
     categoryProgressContainer.innerHTML = '';
     
     Object.entries(breakdown).forEach(([category, amount]) => {
-        // Calculate percentage of total spent
         const percentage = totalSpending > 0 ? ((amount / totalSpending) * 100).toFixed(1) : 0;
         
         const progressItem = document.createElement('div');
@@ -137,8 +159,8 @@ function renderCategoryBreakdown(breakdown, totalSpending) {
     });
 }
 
-// Handle Form Submission (Create or Update)
-async function handleFormSubmit(e) {
+// Handle Add Form Submission
+async function handleAddFormSubmit(e) {
     e.preventDefault();
     
     const payload = {
@@ -149,18 +171,10 @@ async function handleFormSubmit(e) {
         notes: notesInput.value.trim() || null
     };
     
-    const expenseId = expenseIdInput.value;
-    const isEdit = !!expenseId;
-    
-    const url = isEdit ? `${API_BASE}/expenses/${expenseId}` : `${API_BASE}/expenses`;
-    const method = isEdit ? 'PUT' : 'POST';
-    
     try {
-        const response = await fetch(url, {
-            method: method,
-            headers: {
-                'Content-Type': 'application/json'
-            },
+        const response = await fetch(`${API_BASE}/expenses`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
         });
         
@@ -169,7 +183,7 @@ async function handleFormSubmit(e) {
             throw new Error(errData.detail || 'Validation error saving expense');
         }
         
-        resetForm();
+        resetAddForm();
         await loadDashboard();
         
     } catch (error) {
@@ -178,25 +192,70 @@ async function handleFormSubmit(e) {
     }
 }
 
-// Start Edit Mode
+// Open Edit Modal Popup & Prepopulate Data
 window.startEditExpense = function(id) {
-    const expense = allExpenses.find(exp => exp.id === id);
-    if (!expense) return;
+    const expense = allExpenses.find(exp => String(exp.id) === String(id));
+    if (!expense) {
+        console.warn(`Expense with ID ${id} not found.`);
+        return;
+    }
     
-    expenseIdInput.value = expense.id;
-    titleInput.value = expense.title;
-    amountInput.value = expense.amount;
-    categoryInput.value = expense.category;
-    dateInput.value = expense.date;
-    notesInput.value = expense.notes || '';
+    editExpenseIdInput.value = expense.id;
+    editTitleInput.value = expense.title;
+    editAmountInput.value = expense.amount;
+    editCategoryInput.value = expense.category;
     
-    formTitle.textContent = 'Edit Expense';
-    submitBtn.textContent = 'Update Expense';
-    cancelBtn.classList.remove('hidden');
+    // Format date string to YYYY-MM-DD
+    const cleanDate = expense.date && expense.date.includes('T') ? expense.date.split('T')[0] : expense.date;
+    editDateInput.value = cleanDate;
     
-    // Scroll form into view for mobile users
-    expenseForm.scrollIntoView({ behavior: 'smooth' });
+    editNotesInput.value = expense.notes || '';
+    
+    // Show Modal
+    editModalOverlay.classList.remove('hidden');
 };
+
+// Close Edit Modal
+function closeEditModal() {
+    editModalOverlay.classList.add('hidden');
+    editExpenseForm.reset();
+}
+
+// Handle Edit Modal Form Submission (PUT)
+async function handleEditFormSubmit(e) {
+    e.preventDefault();
+    
+    const expenseId = editExpenseIdInput.value;
+    if (!expenseId) return;
+    
+    const payload = {
+        title: editTitleInput.value.trim(),
+        amount: parseFloat(editAmountInput.value),
+        category: editCategoryInput.value,
+        date: editDateInput.value,
+        notes: editNotesInput.value.trim() || null
+    };
+    
+    try {
+        const response = await fetch(`${API_BASE}/expenses/${expenseId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        
+        if (!response.ok) {
+            const errData = await response.json();
+            throw new Error(errData.detail || 'Validation error updating expense');
+        }
+        
+        closeEditModal();
+        await loadDashboard();
+        
+    } catch (error) {
+        alert(`Error updating expense: ${error.message}`);
+        console.error(error);
+    }
+}
 
 // Delete Expense
 window.deleteExpense = async function(id) {
@@ -209,7 +268,6 @@ window.deleteExpense = async function(id) {
         
         if (!response.ok) throw new Error('Failed to delete expense');
         
-        // Remove row immediately or refresh dashboard
         await loadDashboard();
         
     } catch (error) {
@@ -218,18 +276,11 @@ window.deleteExpense = async function(id) {
     }
 };
 
-// Reset Form to initial state
-function resetForm() {
+// Reset Add Form
+function resetAddForm() {
     expenseForm.reset();
-    expenseIdInput.value = '';
-    
-    // Set default date back to today
     const today = new Date().toISOString().split('T')[0];
     dateInput.value = today;
-    
-    formTitle.textContent = 'Add New Expense';
-    submitBtn.textContent = 'Save Expense';
-    cancelBtn.classList.add('hidden');
 }
 
 // Helper: Format Currency
