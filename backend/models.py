@@ -13,3 +13,13 @@ class Expense(Base):
     category = Column(String, nullable=False, index=True)
     date = Column(Date, nullable=False)
     notes = Column(String, nullable=True)
+
+class Budget(Base):
+    """
+    SQLAlchemy model representing the monthly budget threshold setting.
+    """
+    __tablename__ = "budget"
+
+    id = Column(Integer, primary_key=True, index=True)
+    monthly_limit = Column(Float, nullable=False, default=30000.0)
+
