@@ -57,7 +57,7 @@ body {
 }
 
 .app-container {
-    max-width: 1140px;
+    max-width: 1240px;
     margin: 0 auto;
     display: flex;
     flex-direction: column;
@@ -104,15 +104,27 @@ body {
 /* Dashboard summary widgets */
 .dashboard-summary {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    grid-template-columns: repeat(4, 1fr);
     gap: 1.25rem;
+}
+
+@media (max-width: 1200px) {
+    .dashboard-summary {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 640px) {
+    .dashboard-summary {
+        grid-template-columns: 1fr;
+    }
 }
 
 .summary-card {
     background-color: var(--bg-card);
     border: 1px solid var(--border-color);
     border-radius: var(--radius-md);
-    padding: 1.5rem;
+    padding: 1.25rem 1.25rem;
     box-shadow: var(--shadow-sm);
     display: flex;
     flex-direction: column;
@@ -156,16 +168,17 @@ body {
     align-items: baseline;
     gap: 0.35rem;
     margin-bottom: 0.75rem;
+    flex-wrap: wrap;
 }
 
 .budget-values .amount-spent {
-    font-size: 1.5rem;
+    font-size: 1.35rem;
     font-weight: 700;
     color: var(--text-primary);
 }
 
 .budget-values .budget-limit-text {
-    font-size: 0.875rem;
+    font-size: 0.8rem;
     color: var(--text-muted);
     font-weight: 500;
 }
@@ -216,14 +229,14 @@ body {
 }
 
 .summary-icon {
-    width: 36px;
-    height: 36px;
+    width: 34px;
+    height: 34px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: 700;
-    font-size: 0.9rem;
+    font-size: 0.875rem;
 }
 
 .icon-spent { background-color: var(--color-primary-light); color: var(--color-primary); }
@@ -239,20 +252,20 @@ body {
 }
 
 .summary-card .amount {
-    font-size: 2rem;
+    font-size: 1.65rem;
     font-weight: 700;
     color: var(--color-primary);
     letter-spacing: -0.02em;
 }
 
 .summary-card .count {
-    font-size: 2rem;
+    font-size: 1.65rem;
     font-weight: 700;
     color: var(--text-primary);
 }
 
 .summary-card .category-name {
-    font-size: 1.25rem;
+    font-size: 1.15rem;
     font-weight: 600;
     color: var(--text-primary);
     white-space: nowrap;
