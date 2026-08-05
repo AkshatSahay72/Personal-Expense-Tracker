@@ -42,6 +42,7 @@ class ExpenseResponse(ExpenseBase):
     Includes the database-generated ID.
     """
     id: int
+    user_id: Optional[int] = None
 
     model_config = {
         "from_attributes": True
@@ -54,3 +55,25 @@ class ExpenseSummaryResponse(BaseModel):
     total_spending: float = Field(..., description="Total spent across all transactions")
     transaction_count: int = Field(..., description="Total number of transactions")
     category_breakdown: Dict[str, float] = Field(..., description="Spending grouped by category")
+
+class UserBase(BaseModel):
+    username: str = Field(..., min_length=3, max_length=50, description="Username")
+
+class UserCreate(UserBase):
+    password: str = Field(..., min_length=4, max_length=100, description="Password")
+
+class UserLogin(BaseModel):
+    username: str = Field(..., description="Username")
+    password: str = Field(..., description="Password")
+
+class UserResponse(UserBase):
+    id: int
+
+    model_config = {
+        "from_attributes": True
+    }
+
+class TokenResponse(BaseModel):
+    token: str = Field(..., description="Session authentication token")
+    token_type: str = Field("bearer", description="Token type")
+    user: UserResponse = Field(..., description="User details")
