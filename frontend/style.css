@@ -7,8 +7,8 @@
     --text-muted: #64748b;
     
     /* Primary brand colors */
-    --color-primary: #2563eb;          /* Slate Blue */
-    --color-primary-hover: #1d4ed8;
+    --color-primary: #3b82f6;          /* Vibrant Blue */
+    --color-primary-hover: #2563eb;
     --color-primary-light: #eff6ff;
     
     /* Status Colors */
@@ -34,8 +34,8 @@
     
     /* Transitions & Radius */
     --transition-smooth: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    --radius-sm: 6px;
-    --radius-md: 12px;
+    --radius-sm: 8px;
+    --radius-md: 16px;
     
     --font-sans: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
