@@ -139,7 +139,7 @@ def run_tests():
         db_compat.commit()
         
         # Register first user
-        compat_user = crud.create_user(db_compat, schemas.UserCreate(username="first", password="pwd"))
+        compat_user = crud.create_user(db_compat, schemas.UserCreate(username="first", password="password"))
         # Check if the old_exp has been mapped to user
         db_compat.refresh(old_exp)
         assert old_exp.user_id == compat_user.id
