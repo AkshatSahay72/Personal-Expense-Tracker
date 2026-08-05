@@ -9,6 +9,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <div class="app-container">
@@ -121,10 +123,18 @@
                     </div>
                 </div>
 
-                <!-- Transaction Log Table -->
+                <!-- Transaction Log Table & Chart -->
                 <div class="table-container card">
-                    <h2>Transaction Log</h2>
-                    <div class="table-scroll">
+                    <div class="transaction-header">
+                        <h2>Transaction Log</h2>
+                        <button type="button" id="toggle-view-btn" class="btn btn-secondary btn-sm">View Table</button>
+                    </div>
+                    
+                    <div id="chart-view-container" class="chart-wrapper">
+                        <canvas id="expenseChart"></canvas>
+                    </div>
+
+                    <div id="table-view-container" class="table-scroll hidden">
                         <table class="expense-table">
                             <thead>
                                 <tr>

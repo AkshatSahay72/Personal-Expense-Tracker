@@ -50,6 +50,13 @@ const API_BASE = '';
 // App State
 let allExpenses = [];
 let pendingDeleteId = null;
+let expenseChartInstance = null;
+
+// Chart and Toggle Elements
+const toggleViewBtn = document.getElementById('toggle-view-btn');
+const chartViewContainer = document.getElementById('chart-view-container');
+const tableViewContainer = document.getElementById('table-view-container');
+const expenseChartCanvas = document.getElementById('expenseChart');
 
 // Initialize Page
 document.addEventListener('DOMContentLoaded', () => {
@@ -97,6 +104,22 @@ document.addEventListener('DOMContentLoaded', () => {
             if (deleteModalOverlay && !deleteModalOverlay.classList.contains('hidden')) closeDeleteModal();
         }
     });
+
+    // Toggle view listener
+    if (toggleViewBtn) {
+        toggleViewBtn.addEventListener('click', () => {
+            const isTableHidden = tableViewContainer.classList.contains('hidden');
+            if (isTableHidden) {
+                tableViewContainer.classList.remove('hidden');
+                chartViewContainer.classList.add('hidden');
+                toggleViewBtn.textContent = 'View Chart';
+            } else {
+                tableViewContainer.classList.add('hidden');
+                chartViewContainer.classList.remove('hidden');
+                toggleViewBtn.textContent = 'View Table';
+            }
+        });
+    }
 });
 
 // Load all dashboard components
@@ -170,6 +193,11 @@ async function fetchSummary() {
 
         // Render category breakdown progress bars
         renderCategoryBreakdown(summary.category_breakdown, summary.total_spending);
+        
+        // Update Chart
+        if (typeof updateExpenseChart === 'function') {
+            updateExpenseChart(summary.category_breakdown);
+        }
         
     } catch (error) {
         console.error('Error fetching summary:', error);
@@ -429,4 +457,53 @@ function escapeHTML(str) {
             '"': '&quot;'
         }[tag] || tag)
     );
+}
+
+// Update or create the Chart.js instance
+function updateExpenseChart(categoryBreakdown) {
+    if (!expenseChartCanvas || !window.Chart) return;
+    
+    const ctx = expenseChartCanvas.getContext('2d');
+    const labels = Object.keys(categoryBreakdown);
+    const data = Object.values(categoryBreakdown);
+    
+    // Modern colors for the chart
+    const bgColors = [
+        'rgba(59, 130, 246, 0.7)', // Blue
+        'rgba(16, 185, 129, 0.7)', // Green
+        'rgba(245, 158, 11, 0.7)', // Yellow
+        'rgba(239, 68, 68, 0.7)',  // Red
+        'rgba(139, 92, 246, 0.7)', // Purple
+        'rgba(107, 114, 128, 0.7)' // Gray
+    ];
+    
+    const borderColors = bgColors.map(color => color.replace('0.7', '1'));
+
+    if (expenseChartInstance) {
+        expenseChartInstance.data.labels = labels;
+        expenseChartInstance.data.datasets[0].data = data;
+        expenseChartInstance.update();
+    } else {
+        expenseChartInstance = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: data,
+                    backgroundColor: bgColors,
+                    borderColor: borderColors,
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'right'
+                    }
+                }
+            }
+        });
+    }
 }
