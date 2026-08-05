@@ -13,13 +13,19 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <div class="app-container">
+    <div class="app-container hidden" id="app-container">
         <!-- Sidebar / Header -->
         <header class="app-header">
             <div class="logo">
                 <h1>WealthWise</h1>
             </div>
-            <p class="subtitle">Personal Expense Tracker</p>
+            <div class="header-right">
+                <p class="subtitle">Personal Expense Tracker</p>
+                <div class="user-profile-section" id="user-profile">
+                    <span class="user-greeting">Hello, <strong id="username-display">User</strong></span>
+                    <button type="button" class="btn btn-secondary btn-sm" id="logout-btn">Logout</button>
+                </div>
+            </div>
         </header>
 
         <!-- Dashboard Summary Grid -->
@@ -249,6 +255,53 @@
                 <button type="button" class="btn btn-secondary" id="cancel-delete-modal-btn">Cancel</button>
                 <button type="button" class="btn btn-danger" id="confirm-delete-btn">Delete Expense</button>
             </div>
+        </div>
+    <!-- Authentication View (Login/Register Card) -->
+    <div class="auth-container" id="auth-container">
+        <div class="auth-card">
+            <div class="auth-logo">
+                <span class="auth-logo-icon">💵</span>
+                <h1>WealthWise</h1>
+                <p class="auth-logo-subtitle">Personal Expense Tracker</p>
+            </div>
+            
+            <div class="auth-tabs">
+                <button type="button" class="auth-tab active" id="tab-login" onclick="switchAuthTab('login')">Sign In</button>
+                <button type="button" class="auth-tab" id="tab-register" onclick="switchAuthTab('register')">Create Account</button>
+            </div>
+            
+            <!-- Alert message block -->
+            <div id="auth-alert" class="auth-alert hidden"></div>
+
+            <!-- Login Form -->
+            <form id="login-form" class="auth-form">
+                <div class="form-group">
+                    <label for="login-username">Username</label>
+                    <input type="text" id="login-username" required placeholder="Enter your username">
+                </div>
+                <div class="form-group">
+                    <label for="login-password">Password</label>
+                    <input type="password" id="login-password" required placeholder="Enter your password">
+                </div>
+                <button type="submit" class="btn btn-primary auth-submit-btn">Sign In</button>
+            </form>
+
+            <!-- Register Form -->
+            <form id="register-form" class="auth-form hidden">
+                <div class="form-group">
+                    <label for="register-username">Username</label>
+                    <input type="text" id="register-username" required placeholder="Choose a username (min 3 chars)">
+                </div>
+                <div class="form-group">
+                    <label for="register-password">Password</label>
+                    <input type="password" id="register-password" required placeholder="Choose a password (min 4 chars)">
+                </div>
+                <div class="form-group">
+                    <label for="register-confirm-password">Confirm Password</label>
+                    <input type="password" id="register-confirm-password" required placeholder="Confirm your password">
+                </div>
+                <button type="submit" class="btn btn-primary auth-submit-btn">Create Account</button>
+            </form>
         </div>
     </div>
 

@@ -52,6 +52,19 @@ const API_BASE = '';
 let allExpenses = [];
 let pendingDeleteId = null;
 let expenseChartInstance = null;
+let sessionToken = localStorage.getItem('sessionToken');
+let currentUser = null;
+
+// DOM Elements - Auth
+const authContainer = document.getElementById('auth-container');
+const appContainer = document.getElementById('app-container');
+const loginForm = document.getElementById('login-form');
+const registerForm = document.getElementById('register-form');
+const authAlert = document.getElementById('auth-alert');
+const tabLogin = document.getElementById('tab-login');
+const tabRegister = document.getElementById('tab-register');
+const usernameDisplay = document.getElementById('username-display');
+const logoutBtn = document.getElementById('logout-btn');
 
 // Chart and Toggle Elements
 const toggleViewBtn = document.getElementById('toggle-view-btn');
@@ -59,7 +72,6 @@ const chartViewContainer = document.getElementById('chart-view-container');
 const tableViewContainer = document.getElementById('table-view-container');
 const expenseChartCanvas = document.getElementById('expenseChart');
 
-// Initialize Page
 document.addEventListener('DOMContentLoaded', () => {
     // Set default date picker to today
     const today = new Date().toISOString().split('T')[0];
@@ -67,13 +79,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     searchExpenseInput.addEventListener("input", filterExpenses);
 
-    // Load initial data
-    loadDashboard();
+    // Check if token exists and verify it
+    checkAuth();
     
     // Setup event listeners
     expenseForm.addEventListener('submit', handleAddFormSubmit);
     editExpenseForm.addEventListener('submit', handleEditFormSubmit);
     budgetForm.addEventListener('submit', handleBudgetFormSubmit);
+    
+    loginForm.addEventListener('submit', handleLoginFormSubmit);
+    registerForm.addEventListener('submit', handleRegisterFormSubmit);
+    logoutBtn.addEventListener('click', handleLogout);
     
     closeModalBtn.addEventListener('click', closeEditModal);
     editCancelBtn.addEventListener('click', closeEditModal);
@@ -134,7 +150,7 @@ async function loadDashboard() {
 // Fetch all expenses from backend
 async function fetchExpenses() {
     try {
-        const response = await fetch(`${API_BASE}/expenses`);
+        const response = await apiFetch(`${API_BASE}/expenses`);
         if (!response.ok) throw new Error('Failed to fetch expenses');
         allExpenses = await response.json();
         renderExpensesTable(allExpenses);
@@ -149,7 +165,7 @@ async function fetchExpenses() {
 // Fetch and render summary details
 async function fetchSummary() {
     try {
-        const response = await fetch(`${API_BASE}/summary`);
+        const response = await apiFetch(`${API_BASE}/summary`);
         if (!response.ok) throw new Error('Failed to fetch summary data');
         const summary = await response.json();
         
@@ -270,7 +286,7 @@ async function handleAddFormSubmit(e) {
     };
     
     try {
-        const response = await fetch(`${API_BASE}/expenses`, {
+        const response = await apiFetch(`${API_BASE}/expenses`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
@@ -335,7 +351,7 @@ async function handleEditFormSubmit(e) {
     };
     
     try {
-        const response = await fetch(`${API_BASE}/expenses/${expenseId}`, {
+        const response = await apiFetch(`${API_BASE}/expenses/${expenseId}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
@@ -389,7 +405,7 @@ async function handleBudgetFormSubmit(e) {
     if (isNaN(newLimit) || newLimit <= 0) return;
     
     try {
-        const response = await fetch(`${API_BASE}/budget`, {
+        const response = await apiFetch(`${API_BASE}/budget`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ monthly_limit: newLimit })
@@ -424,7 +440,7 @@ async function handleConfirmDelete() {
     if (!pendingDeleteId) return;
     
     try {
-        const response = await fetch(`${API_BASE}/expenses/${pendingDeleteId}`, {
+        const response = await apiFetch(`${API_BASE}/expenses/${pendingDeleteId}`, {
             method: 'DELETE'
         });
         
@@ -525,4 +541,194 @@ function updateExpenseChart(categoryBreakdown) {
             }
         });
     }
+}
+
+// Authenticated API fetch wrapper
+async function apiFetch(url, options = {}) {
+    const headers = options.headers || {};
+    if (sessionToken) {
+        headers['Authorization'] = `Bearer ${sessionToken}`;
+    }
+    
+    const response = await fetch(url, {
+        ...options,
+        headers: headers
+    });
+    
+    if (response.status === 401) {
+        handleUnauthenticated();
+    }
+    
+    return response;
+}
+
+// Check auth status on load
+async function checkAuth() {
+    if (!sessionToken) {
+        handleUnauthenticated();
+        return;
+    }
+    
+    try {
+        const response = await fetch(`${API_BASE}/me`, {
+            headers: { 'Authorization': `Bearer ${sessionToken}` }
+        });
+        
+        if (response.ok) {
+            currentUser = await response.json();
+            usernameDisplay.textContent = currentUser.username;
+            
+            authContainer.classList.add('hidden');
+            appContainer.classList.remove('hidden');
+            
+            await loadDashboard();
+        } else {
+            handleUnauthenticated();
+        }
+    } catch (error) {
+        console.error('Error verifying authentication:', error);
+        handleUnauthenticated();
+    }
+}
+
+// Switch between login & register tabs
+window.switchAuthTab = function(tab) {
+    showAuthAlert('');
+    
+    if (tab === 'login') {
+        tabLogin.classList.add('active');
+        tabRegister.classList.remove('active');
+        loginForm.classList.remove('hidden');
+        registerForm.classList.add('hidden');
+    } else {
+        tabLogin.classList.remove('active');
+        tabRegister.classList.add('active');
+        loginForm.classList.add('hidden');
+        registerForm.classList.remove('hidden');
+    }
+};
+
+// Handle Login Submit
+async function handleLoginFormSubmit(e) {
+    e.preventDefault();
+    const username = document.getElementById('login-username').value.trim();
+    const password = document.getElementById('login-password').value;
+    
+    showAuthAlert('');
+    
+    try {
+        const response = await fetch(`${API_BASE}/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+            sessionToken = data.token;
+            localStorage.setItem('sessionToken', sessionToken);
+            currentUser = data.user;
+            usernameDisplay.textContent = currentUser.username;
+            
+            showAuthAlert('Success! Logging you in...', 'success');
+            
+            setTimeout(async () => {
+                authContainer.classList.add('hidden');
+                appContainer.classList.remove('hidden');
+                loginForm.reset();
+                await loadDashboard();
+            }, 800);
+        } else {
+            showAuthAlert(data.detail || 'Login failed. Please check credentials.', 'error');
+        }
+    } catch (error) {
+        showAuthAlert('Network error connecting to login service.', 'error');
+        console.error(error);
+    }
+}
+
+// Handle Register Submit
+async function handleRegisterFormSubmit(e) {
+    e.preventDefault();
+    const username = document.getElementById('register-username').value.trim();
+    const password = document.getElementById('register-password').value;
+    const confirmPassword = document.getElementById('register-confirm-password').value;
+    
+    showAuthAlert('');
+    
+    if (password !== confirmPassword) {
+        showAuthAlert('Passwords do not match.', 'error');
+        return;
+    }
+    
+    try {
+        const response = await fetch(`${API_BASE}/register`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+            sessionToken = data.token;
+            localStorage.setItem('sessionToken', sessionToken);
+            currentUser = data.user;
+            usernameDisplay.textContent = currentUser.username;
+            
+            showAuthAlert('Account created successfully! Redirecting...', 'success');
+            
+            setTimeout(async () => {
+                authContainer.classList.add('hidden');
+                appContainer.classList.remove('hidden');
+                registerForm.reset();
+                await loadDashboard();
+            }, 800);
+        } else {
+            showAuthAlert(data.detail || 'Registration failed. Username may be taken.', 'error');
+        }
+    } catch (error) {
+        showAuthAlert('Network error connecting to registration service.', 'error');
+        console.error(error);
+    }
+}
+
+// Show alert message in auth card
+function showAuthAlert(message, type = '') {
+    if (!message) {
+        authAlert.classList.add('hidden');
+        authAlert.className = 'auth-alert hidden';
+        authAlert.textContent = '';
+        return;
+    }
+    
+    authAlert.textContent = message;
+    authAlert.className = `auth-alert ${type}`;
+    authAlert.classList.remove('hidden');
+}
+
+// Logout Handler
+async function handleLogout() {
+    if (sessionToken) {
+        try {
+            await fetch(`${API_BASE}/logout`, {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${sessionToken}` }
+            });
+        } catch (error) {
+            console.error('Error logging out from server:', error);
+        }
+    }
+    handleUnauthenticated();
+}
+
+// Handle unauthenticated state
+function handleUnauthenticated() {
+    sessionToken = null;
+    localStorage.removeItem('sessionToken');
+    currentUser = null;
+    
+    appContainer.classList.add('hidden');
+    authContainer.classList.remove('hidden');
 }
