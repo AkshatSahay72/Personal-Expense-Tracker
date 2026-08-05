@@ -1,27 +1,63 @@
-// DOM Elements
+// DOM Elements - Main Form
 const expenseForm = document.getElementById('expense-form');
-const expenseIdInput = document.getElementById('expense-id');
 const titleInput = document.getElementById('title');
 const amountInput = document.getElementById('amount');
 const categoryInput = document.getElementById('category');
 const dateInput = document.getElementById('date');
 const notesInput = document.getElementById('notes');
 
-const formTitle = document.getElementById('form-title');
-const submitBtn = document.getElementById('submit-btn');
-const cancelBtn = document.getElementById('cancel-btn');
+// DOM Elements - Edit Modal
+const editModalOverlay = document.getElementById('edit-modal-overlay');
+const editExpenseForm = document.getElementById('edit-expense-form');
+const editExpenseIdInput = document.getElementById('edit-expense-id');
+const editTitleInput = document.getElementById('edit-title');
+const editAmountInput = document.getElementById('edit-amount');
+const editCategoryInput = document.getElementById('edit-category');
+const editDateInput = document.getElementById('edit-date');
+const editNotesInput = document.getElementById('edit-notes');
+const closeModalBtn = document.getElementById('close-modal-btn');
+const editCancelBtn = document.getElementById('edit-cancel-btn');
 
+// Dashboard Display Elements
 const expenseList = document.getElementById('expense-list');
 const totalSpentEl = document.getElementById('total-spent');
 const transactionCountEl = document.getElementById('transaction-count');
 const topCategoryEl = document.getElementById('top-category');
 const categoryProgressContainer = document.getElementById('category-progress-container');
 
-// API Base URL (empty string since frontend is served from the same origin)
+// DOM Elements - Budget Modal & Display
+const monthSpentEl = document.getElementById('month-spent');
+const budgetLimitEl = document.getElementById('budget-limit');
+const budgetProgressFill = document.getElementById('budget-progress-fill');
+const budgetStatusBadge = document.getElementById('budget-status-badge');
+const openBudgetModalBtn = document.getElementById('open-budget-modal-btn');
+const budgetModalOverlay = document.getElementById('budget-modal-overlay');
+const budgetForm = document.getElementById('budget-form');
+const monthlyBudgetInput = document.getElementById('monthly-budget-input');
+const searchExpenseInput = document.getElementById("search-expense");
+const closeBudgetModalBtn = document.getElementById('close-budget-modal-btn');
+const cancelBudgetModalBtn = document.getElementById('cancel-budget-modal-btn');
+
+// DOM Elements - Delete Modal
+const deleteModalOverlay = document.getElementById('delete-modal-overlay');
+const deleteExpenseTitleEl = document.getElementById('delete-expense-title');
+const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
+const closeDeleteModalBtn = document.getElementById('close-delete-modal-btn');
+const cancelDeleteModalBtn = document.getElementById('cancel-delete-modal-btn');
+
+// API Base URL
 const API_BASE = '';
 
 // App State
 let allExpenses = [];
+let pendingDeleteId = null;
+let expenseChartInstance = null;
+
+// Chart and Toggle Elements
+const toggleViewBtn = document.getElementById('toggle-view-btn');
+const chartViewContainer = document.getElementById('chart-view-container');
+const tableViewContainer = document.getElementById('table-view-container');
+const expenseChartCanvas = document.getElementById('expenseChart');
 
 // Initialize Page
 document.addEventListener('DOMContentLoaded', () => {
@@ -29,12 +65,64 @@ document.addEventListener('DOMContentLoaded', () => {
     const today = new Date().toISOString().split('T')[0];
     dateInput.value = today;
 
+    searchExpenseInput.addEventListener("input", filterExpenses);
+
     // Load initial data
     loadDashboard();
     
     // Setup event listeners
-    expenseForm.addEventListener('submit', handleFormSubmit);
-    cancelBtn.addEventListener('click', resetForm);
+    expenseForm.addEventListener('submit', handleAddFormSubmit);
+    editExpenseForm.addEventListener('submit', handleEditFormSubmit);
+    budgetForm.addEventListener('submit', handleBudgetFormSubmit);
+    
+    closeModalBtn.addEventListener('click', closeEditModal);
+    editCancelBtn.addEventListener('click', closeEditModal);
+    
+    openBudgetModalBtn.addEventListener('click', openBudgetModal);
+    closeBudgetModalBtn.addEventListener('click', closeBudgetModal);
+    cancelBudgetModalBtn.addEventListener('click', closeBudgetModal);
+
+    closeDeleteModalBtn.addEventListener('click', closeDeleteModal);
+    cancelDeleteModalBtn.addEventListener('click', closeDeleteModal);
+    confirmDeleteBtn.addEventListener('click', handleConfirmDelete);
+    
+    // Close modal when clicking on overlay background
+    editModalOverlay.addEventListener('click', (e) => {
+        if (e.target === editModalOverlay) closeEditModal();
+    });
+
+    budgetModalOverlay.addEventListener('click', (e) => {
+        if (e.target === budgetModalOverlay) closeBudgetModal();
+    });
+
+    deleteModalOverlay.addEventListener('click', (e) => {
+        if (e.target === deleteModalOverlay) closeDeleteModal();
+    });
+
+    // Close modal on Escape key
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            if (editModalOverlay && !editModalOverlay.classList.contains('hidden')) closeEditModal();
+            if (budgetModalOverlay && !budgetModalOverlay.classList.contains('hidden')) closeBudgetModal();
+            if (deleteModalOverlay && !deleteModalOverlay.classList.contains('hidden')) closeDeleteModal();
+        }
+    });
+
+    // Toggle view listener
+    if (toggleViewBtn) {
+        toggleViewBtn.addEventListener('click', () => {
+            const isTableHidden = tableViewContainer.classList.contains('hidden');
+            if (isTableHidden) {
+                tableViewContainer.classList.remove('hidden');
+                chartViewContainer.classList.add('hidden');
+                toggleViewBtn.textContent = 'View Chart';
+            } else {
+                tableViewContainer.classList.add('hidden');
+                chartViewContainer.classList.remove('hidden');
+                toggleViewBtn.textContent = 'View Table';
+            }
+        });
+    }
 });
 
 // Load all dashboard components
@@ -48,13 +136,15 @@ async function fetchExpenses() {
     try {
         const response = await fetch(`${API_BASE}/expenses`);
         if (!response.ok) throw new Error('Failed to fetch expenses');
-        allExpenses = await response.ok ? await response.json() : [];
+        allExpenses = await response.json();
         renderExpensesTable(allExpenses);
     } catch (error) {
         console.error('Error fetching expenses:', error);
         expenseList.innerHTML = `<tr><td colspan="6" style="text-align: center; color: red;">Error loading expenses.</td></tr>`;
     }
 }
+
+
 
 // Fetch and render summary details
 async function fetchSummary() {
@@ -80,8 +170,39 @@ async function fetchSummary() {
         
         topCategoryEl.textContent = topCategory !== 'N/A' ? `${topCategory} (${formatCurrency(maxAmount)})` : 'N/A';
         
+        // Update Monthly Budget Metrics
+        if (monthSpentEl && budgetLimitEl && budgetProgressFill && budgetStatusBadge) {
+            monthSpentEl.textContent = formatCurrency(summary.current_month_spending || 0);
+            budgetLimitEl.textContent = formatCurrency(summary.monthly_budget || 30000);
+            
+            const pct = summary.budget_percentage_used || 0;
+            budgetStatusBadge.textContent = `${pct}%`;
+            
+            const fillWidth = Math.min(pct, 100);
+            budgetProgressFill.style.width = `${fillWidth}%`;
+            
+            budgetStatusBadge.className = 'budget-status-badge ';
+            budgetProgressFill.className = 'budget-progress-fill ';
+            
+            if (pct < 75) {
+                budgetStatusBadge.classList.add('badge-healthy');
+                budgetProgressFill.classList.add('fill-healthy');
+            } else if (pct <= 90) {
+                budgetStatusBadge.classList.add('badge-caution');
+                budgetProgressFill.classList.add('fill-caution');
+            } else {
+                budgetStatusBadge.classList.add('badge-alert');
+                budgetProgressFill.classList.add('fill-alert');
+            }
+        }
+
         // Render category breakdown progress bars
         renderCategoryBreakdown(summary.category_breakdown, summary.total_spending);
+        
+        // Update Chart
+        if (typeof updateExpenseChart === 'function') {
+            updateExpenseChart(summary.category_breakdown);
+        }
         
     } catch (error) {
         console.error('Error fetching summary:', error);
@@ -106,8 +227,8 @@ function renderExpensesTable(expenses) {
             </td>
             <td class="actions-col">
                 <div class="action-buttons">
-                    <button type="button" class="btn-icon" onclick="startEditExpense(${expense.id})" title="Edit Expense">Edit</button>
-                    <button type="button" class="btn-icon" onclick="deleteExpense(${expense.id})" title="Delete Expense" style="color: var(--color-danger); border-color: rgba(220, 38, 38, 0.2);">Delete</button>
+                    <button type="button" class="btn-action-edit" onclick="startEditExpense(${expense.id})" title="Edit Expense">Edit</button>
+                    <button type="button" class="btn-action-delete" onclick="deleteExpense(${expense.id})" title="Delete Expense">Delete</button>
                 </div>
             </td>
         </tr>
@@ -119,7 +240,6 @@ function renderCategoryBreakdown(breakdown, totalSpending) {
     categoryProgressContainer.innerHTML = '';
     
     Object.entries(breakdown).forEach(([category, amount]) => {
-        // Calculate percentage of total spent
         const percentage = totalSpending > 0 ? ((amount / totalSpending) * 100).toFixed(1) : 0;
         
         const progressItem = document.createElement('div');
@@ -137,8 +257,8 @@ function renderCategoryBreakdown(breakdown, totalSpending) {
     });
 }
 
-// Handle Form Submission (Create or Update)
-async function handleFormSubmit(e) {
+// Handle Add Form Submission
+async function handleAddFormSubmit(e) {
     e.preventDefault();
     
     const payload = {
@@ -149,18 +269,10 @@ async function handleFormSubmit(e) {
         notes: notesInput.value.trim() || null
     };
     
-    const expenseId = expenseIdInput.value;
-    const isEdit = !!expenseId;
-    
-    const url = isEdit ? `${API_BASE}/expenses/${expenseId}` : `${API_BASE}/expenses`;
-    const method = isEdit ? 'PUT' : 'POST';
-    
     try {
-        const response = await fetch(url, {
-            method: method,
-            headers: {
-                'Content-Type': 'application/json'
-            },
+        const response = await fetch(`${API_BASE}/expenses`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
         });
         
@@ -169,7 +281,7 @@ async function handleFormSubmit(e) {
             throw new Error(errData.detail || 'Validation error saving expense');
         }
         
-        resetForm();
+        resetAddForm();
         await loadDashboard();
         
     } catch (error) {
@@ -178,58 +290,160 @@ async function handleFormSubmit(e) {
     }
 }
 
-// Start Edit Mode
+// Open Edit Modal Popup & Prepopulate Data
 window.startEditExpense = function(id) {
-    const expense = allExpenses.find(exp => exp.id === id);
-    if (!expense) return;
+    const expense = allExpenses.find(exp => String(exp.id) === String(id));
+    if (!expense) {
+        console.warn(`Expense with ID ${id} not found.`);
+        return;
+    }
     
-    expenseIdInput.value = expense.id;
-    titleInput.value = expense.title;
-    amountInput.value = expense.amount;
-    categoryInput.value = expense.category;
-    dateInput.value = expense.date;
-    notesInput.value = expense.notes || '';
+    editExpenseIdInput.value = expense.id;
+    editTitleInput.value = expense.title;
+    editAmountInput.value = expense.amount;
+    editCategoryInput.value = expense.category;
     
-    formTitle.textContent = 'Edit Expense';
-    submitBtn.textContent = 'Update Expense';
-    cancelBtn.classList.remove('hidden');
+    // Format date string to YYYY-MM-DD
+    const cleanDate = expense.date && expense.date.includes('T') ? expense.date.split('T')[0] : expense.date;
+    editDateInput.value = cleanDate;
     
-    // Scroll form into view for mobile users
-    expenseForm.scrollIntoView({ behavior: 'smooth' });
+    editNotesInput.value = expense.notes || '';
+    
+    // Show Modal
+    editModalOverlay.classList.remove('hidden');
 };
 
-// Delete Expense
-window.deleteExpense = async function(id) {
-    if (!confirm('Are you sure you want to delete this expense?')) return;
+// Close Edit Modal
+function closeEditModal() {
+    editModalOverlay.classList.add('hidden');
+    editExpenseForm.reset();
+}
+
+// Handle Edit Modal Form Submission (PUT)
+async function handleEditFormSubmit(e) {
+    e.preventDefault();
+    
+    const expenseId = editExpenseIdInput.value;
+    if (!expenseId) return;
+    
+    const payload = {
+        title: editTitleInput.value.trim(),
+        amount: parseFloat(editAmountInput.value),
+        category: editCategoryInput.value,
+        date: editDateInput.value,
+        notes: editNotesInput.value.trim() || null
+    };
     
     try {
-        const response = await fetch(`${API_BASE}/expenses/${id}`, {
+        const response = await fetch(`${API_BASE}/expenses/${expenseId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        
+        if (!response.ok) {
+            const errData = await response.json();
+            throw new Error(errData.detail || 'Validation error updating expense');
+        }
+        
+        closeEditModal();
+        await loadDashboard();
+        
+    } catch (error) {
+        alert(`Error updating expense: ${error.message}`);
+        console.error(error);
+    }
+}
+
+// Open Budget Modal
+function openBudgetModal() {
+    const currentLimitStr = budgetLimitEl.textContent.replace(/[^0-9.]/g, '');
+    monthlyBudgetInput.value = currentLimitStr || 30000;
+    budgetModalOverlay.classList.remove('hidden');
+}
+
+function filterExpenses(){
+
+    const keyword = searchExpenseInput.value
+        .trim()
+        .toLowerCase();
+
+    const filtered = allExpenses.filter(expense =>
+        expense.title.toLowerCase().includes(keyword)
+    );
+
+    renderExpensesTable(filtered);
+
+}
+
+// Close Budget Modal
+function closeBudgetModal() {
+    budgetModalOverlay.classList.add('hidden');
+    budgetForm.reset();
+}
+
+// Handle Budget Form Submit (PUT /budget)
+async function handleBudgetFormSubmit(e) {
+    e.preventDefault();
+    const newLimit = parseFloat(monthlyBudgetInput.value);
+    if (isNaN(newLimit) || newLimit <= 0) return;
+    
+    try {
+        const response = await fetch(`${API_BASE}/budget`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ monthly_limit: newLimit })
+        });
+        
+        if (!response.ok) throw new Error('Failed to update budget limit');
+        
+        closeBudgetModal();
+        await loadDashboard();
+    } catch (error) {
+        alert(`Error updating budget: ${error.message}`);
+        console.error(error);
+    }
+}
+
+// Trigger Delete Confirmation Modal
+window.deleteExpense = function(id) {
+    const expense = allExpenses.find(exp => String(exp.id) === String(id));
+    pendingDeleteId = id;
+    deleteExpenseTitleEl.textContent = expense ? `"${expense.title}"` : 'this expense';
+    deleteModalOverlay.classList.remove('hidden');
+};
+
+// Close Delete Modal
+function closeDeleteModal() {
+    deleteModalOverlay.classList.add('hidden');
+    pendingDeleteId = null;
+}
+
+// Handle Confirm Delete
+async function handleConfirmDelete() {
+    if (!pendingDeleteId) return;
+    
+    try {
+        const response = await fetch(`${API_BASE}/expenses/${pendingDeleteId}`, {
             method: 'DELETE'
         });
         
         if (!response.ok) throw new Error('Failed to delete expense');
         
-        // Remove row immediately or refresh dashboard
+        closeDeleteModal();
         await loadDashboard();
         
     } catch (error) {
         alert(`Error deleting expense: ${error.message}`);
         console.error(error);
     }
-};
+}
 
-// Reset Form to initial state
-function resetForm() {
+// Reset Add Form
+function resetAddForm() {
     expenseForm.reset();
-    expenseIdInput.value = '';
-    
-    // Set default date back to today
     const today = new Date().toISOString().split('T')[0];
     dateInput.value = today;
-    
-    formTitle.textContent = 'Add New Expense';
-    submitBtn.textContent = 'Save Expense';
-    cancelBtn.classList.add('hidden');
 }
 
 // Helper: Format Currency
@@ -262,4 +476,53 @@ function escapeHTML(str) {
             '"': '&quot;'
         }[tag] || tag)
     );
+}
+
+// Update or create the Chart.js instance
+function updateExpenseChart(categoryBreakdown) {
+    if (!expenseChartCanvas || !window.Chart) return;
+    
+    const ctx = expenseChartCanvas.getContext('2d');
+    const labels = Object.keys(categoryBreakdown);
+    const data = Object.values(categoryBreakdown);
+    
+    // Modern colors for the chart
+    const bgColors = [
+        'rgba(59, 130, 246, 0.7)', // Blue
+        'rgba(16, 185, 129, 0.7)', // Green
+        'rgba(245, 158, 11, 0.7)', // Yellow
+        'rgba(239, 68, 68, 0.7)',  // Red
+        'rgba(139, 92, 246, 0.7)', // Purple
+        'rgba(107, 114, 128, 0.7)' // Gray
+    ];
+    
+    const borderColors = bgColors.map(color => color.replace('0.7', '1'));
+
+    if (expenseChartInstance) {
+        expenseChartInstance.data.labels = labels;
+        expenseChartInstance.data.datasets[0].data = data;
+        expenseChartInstance.update();
+    } else {
+        expenseChartInstance = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: data,
+                    backgroundColor: bgColors,
+                    borderColor: borderColors,
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'right'
+                    }
+                }
+            }
+        });
+    }
 }

@@ -9,6 +9,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <div class="app-container">
@@ -23,16 +25,41 @@
         <!-- Dashboard Summary Grid -->
         <section class="dashboard-summary">
             <div class="summary-card total-spent-card">
-                <h3>Total Spending</h3>
+                <div class="summary-header">
+                    <h3>Total Spending</h3>
+                    <div class="summary-icon icon-spent">₹</div>
+                </div>
                 <p class="amount" id="total-spent">₹0.00</p>
             </div>
             <div class="summary-card transactions-card">
-                <h3>Transactions</h3>
+                <div class="summary-header">
+                    <h3>Transactions</h3>
+                    <div class="summary-icon icon-count">#</div>
+                </div>
                 <p class="count" id="transaction-count">0</p>
             </div>
             <div class="summary-card breakdown-card">
-                <h3>Top Category</h3>
+                <div class="summary-header">
+                    <h3>Top Category</h3>
+                    <div class="summary-icon icon-top">★</div>
+                </div>
                 <p class="category-name" id="top-category">N/A</p>
+            </div>
+            <div class="summary-card budget-card">
+                <div class="summary-header">
+                    <h3>Monthly Budget</h3>
+                    <button type="button" class="btn-edit-budget" id="open-budget-modal-btn" title="Set Target">Set Limit</button>
+                </div>
+                <div class="budget-values">
+                    <span class="amount-spent" id="month-spent">₹0.00</span>
+                    <span class="budget-limit-text">/ <span id="budget-limit">₹30,000</span></span>
+                </div>
+                <div class="budget-progress-container">
+                    <div class="budget-progress-bar">
+                        <div class="budget-progress-fill" id="budget-progress-fill" style="width: 0%;"></div>
+                    </div>
+                    <span class="budget-status-badge badge-healthy" id="budget-status-badge">0%</span>
+                </div>
             </div>
         </section>
 
@@ -96,10 +123,25 @@
                     </div>
                 </div>
 
-                <!-- Transaction Log Table -->
+                <!-- Transaction Log Table & Chart -->
                 <div class="table-container card">
-                    <h2>Transaction Log</h2>
-                    <div class="table-scroll">
+                    <div class="search-container" style="margin-bottom: 1rem;">
+                    <input
+                        type="text"
+                        id="search-expense"
+                        placeholder="Search by title..."
+                    >
+                </div>
+                    <div class="transaction-header">
+                        <h2>Transaction Log</h2>
+                        <button type="button" id="toggle-view-btn" class="btn btn-secondary btn-sm">View Table</button>
+                    </div>
+                    
+                    <div id="chart-view-container" class="chart-wrapper">
+                        <canvas id="expenseChart"></canvas>
+                    </div>
+
+                    <div id="table-view-container" class="table-scroll hidden">
                         <table class="expense-table">
                             <thead>
                                 <tr>
@@ -118,7 +160,96 @@
                     </div>
                 </div>
             </section>
-        </main>
+    <!-- Edit Expense Modal Popup -->
+    <div class="modal-overlay hidden" id="edit-modal-overlay">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h2>Edit Expense</h2>
+                <button type="button" class="modal-close" id="close-modal-btn" aria-label="Close Modal">&times;</button>
+            </div>
+            <form id="edit-expense-form">
+                <input type="hidden" id="edit-expense-id">
+                
+                <div class="form-group">
+                    <label for="edit-title">Expense Title</label>
+                    <input type="text" id="edit-title" required placeholder="e.g. Grocery Shopping">
+                </div>
+
+                <div class="form-group-row">
+                    <div class="form-group">
+                        <label for="edit-amount">Amount (₹)</label>
+                        <input type="number" id="edit-amount" step="0.01" min="0.01" required placeholder="0.00">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="edit-category">Category</label>
+                        <select id="edit-category" required>
+                            <option value="" disabled>Select Category</option>
+                            <option value="Food">Food</option>
+                            <option value="Shopping">Shopping</option>
+                            <option value="Travel">Travel</option>
+                            <option value="Bills">Bills</option>
+                            <option value="Entertainment">Entertainment</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="edit-date">Transaction Date</label>
+                    <input type="date" id="edit-date" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="edit-notes">Notes (Optional)</label>
+                    <textarea id="edit-notes" rows="3" placeholder="Add additional details..."></textarea>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" id="edit-cancel-btn">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Update Expense</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Set Budget Modal Popup -->
+    <div class="modal-overlay hidden" id="budget-modal-overlay">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h2>Set Monthly Budget Target</h2>
+                <button type="button" class="modal-close" id="close-budget-modal-btn" aria-label="Close Modal">&times;</button>
+            </div>
+            <form id="budget-form">
+                <div class="form-group">
+                    <label for="monthly-budget-input">Monthly Limit Target (₹)</label>
+                    <input type="number" id="monthly-budget-input" step="100" min="0" required placeholder="e.g. 30000">
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" id="cancel-budget-modal-btn">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Target</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Delete Expense Confirmation Modal Popup -->
+    <div class="modal-overlay hidden" id="delete-modal-overlay">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h2>Delete Expense</h2>
+                <button type="button" class="modal-close" id="close-delete-modal-btn" aria-label="Close Modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p class="delete-warning-text">Are you sure you want to delete <strong id="delete-expense-title">this expense</strong>?</p>
+                <p class="delete-subtext" style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.25rem;">This action cannot be undone.</p>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-secondary" id="cancel-delete-modal-btn">Cancel</button>
+                <button type="button" class="btn btn-danger" id="confirm-delete-btn">Delete Expense</button>
+            </div>
+        </div>
     </div>
 
     <script src="script.js"></script>

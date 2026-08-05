@@ -41,3 +41,13 @@ class Expense(Base):
     user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=True)
 
     owner = relationship("User", back_populates="expenses")
+
+class Budget(Base):
+    """
+    SQLAlchemy model representing the monthly budget threshold setting.
+    """
+    __tablename__ = "budget"
+
+    id = Column(Integer, primary_key=True, index=True)
+    monthly_limit = Column(Float, nullable=False, default=30000.0)
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=True)

@@ -155,9 +155,31 @@ def delete_expense(db: Session, db_expense: models.Expense):
     db.commit()
     return db_expense
 
+def get_budget(db: Session, user_id: int):
+    """
+    Get current monthly budget setting or initialize default (30,000) for a specific user.
+    """
+    budget = db.query(models.Budget).filter(models.Budget.user_id == user_id).first()
+    if not budget:
+        budget = models.Budget(monthly_limit=30000.0, user_id=user_id)
+        db.add(budget)
+        db.commit()
+        db.refresh(budget)
+    return budget
+
+def set_budget(db: Session, monthly_limit: float, user_id: int):
+    """
+    Update the monthly budget limit for a specific user.
+    """
+    budget = get_budget(db, user_id=user_id)
+    budget.monthly_limit = monthly_limit
+    db.commit()
+    db.refresh(budget)
+    return budget
+
 def get_expense_summary(db: Session, user_id: int):
     """
-    Calculate summary stats: total spending, count of records, and category breakdown for a specific user.
+    Calculate summary stats: total spending, count of records, category breakdown, and monthly budget progress for a specific user.
     """
     total = db.query(func.sum(models.Expense.amount)).filter(models.Expense.user_id == user_id).scalar() or 0.0
     count = db.query(func.count(models.Expense.id)).filter(models.Expense.user_id == user_id).scalar() or 0
@@ -174,9 +196,22 @@ def get_expense_summary(db: Session, user_id: int):
         if cat.value not in breakdown:
             breakdown[cat.value] = 0.0
             
+    # Calculate current calendar month spending
+    today_str = datetime.date.today().strftime('%Y-%m')
+    current_month_spending = db.query(func.sum(models.Expense.amount)).filter(
+        models.Expense.user_id == user_id,
+        func.strftime('%Y-%m', models.Expense.date) == today_str
+    ).scalar() or 0.0
+
+    budget_obj = get_budget(db, user_id=user_id)
+    monthly_budget = budget_obj.monthly_limit
+    budget_pct = round((current_month_spending / monthly_budget) * 100, 1) if monthly_budget > 0 else 0.0
+
     return {
         "total_spending": total,
         "transaction_count": count,
-        "category_breakdown": breakdown
+        "category_breakdown": breakdown,
+        "monthly_budget": monthly_budget,
+        "current_month_spending": current_month_spending,
+        "budget_percentage_used": budget_pct
     }
-

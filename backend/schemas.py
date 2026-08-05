@@ -55,6 +55,9 @@ class ExpenseSummaryResponse(BaseModel):
     total_spending: float = Field(..., description="Total spent across all transactions")
     transaction_count: int = Field(..., description="Total number of transactions")
     category_breakdown: Dict[str, float] = Field(..., description="Spending grouped by category")
+    monthly_budget: float = Field(30000.0, description="Monthly budget limit target")
+    current_month_spending: float = Field(0.0, description="Spending in current calendar month")
+    budget_percentage_used: float = Field(0.0, description="Percentage of monthly budget used")
 
 class UserBase(BaseModel):
     username: str = Field(..., min_length=3, max_length=50, description="Username")
@@ -77,3 +80,21 @@ class TokenResponse(BaseModel):
     token: str = Field(..., description="Session authentication token")
     token_type: str = Field("bearer", description="Token type")
     user: UserResponse = Field(..., description="User details")
+
+class BudgetUpdate(BaseModel):
+    """
+    Schema for updating monthly budget limit.
+    """
+    monthly_limit: float = Field(..., gt=0, description="Monthly budget target limit (must be > 0)")
+
+class BudgetResponse(BaseModel):
+    """
+    Schema for returning monthly budget.
+    """
+    id: int
+    monthly_limit: float
+    user_id: Optional[int] = None
+
+    model_config = {
+        "from_attributes": True
+    }
