@@ -34,6 +34,7 @@ const openBudgetModalBtn = document.getElementById('open-budget-modal-btn');
 const budgetModalOverlay = document.getElementById('budget-modal-overlay');
 const budgetForm = document.getElementById('budget-form');
 const monthlyBudgetInput = document.getElementById('monthly-budget-input');
+const searchExpenseInput = document.getElementById("search-expense");
 const closeBudgetModalBtn = document.getElementById('close-budget-modal-btn');
 const cancelBudgetModalBtn = document.getElementById('cancel-budget-modal-btn');
 
@@ -63,6 +64,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // Set default date picker to today
     const today = new Date().toISOString().split('T')[0];
     dateInput.value = today;
+
+    searchExpenseInput.addEventListener("input", filterExpenses);
 
     // Load initial data
     loadDashboard();
@@ -140,6 +143,8 @@ async function fetchExpenses() {
         expenseList.innerHTML = `<tr><td colspan="6" style="text-align: center; color: red;">Error loading expenses.</td></tr>`;
     }
 }
+
+
 
 // Fetch and render summary details
 async function fetchSummary() {
@@ -355,6 +360,20 @@ function openBudgetModal() {
     const currentLimitStr = budgetLimitEl.textContent.replace(/[^0-9.]/g, '');
     monthlyBudgetInput.value = currentLimitStr || 30000;
     budgetModalOverlay.classList.remove('hidden');
+}
+
+function filterExpenses(){
+
+    const keyword = searchExpenseInput.value
+        .trim()
+        .toLowerCase();
+
+    const filtered = allExpenses.filter(expense =>
+        expense.title.toLowerCase().includes(keyword)
+    );
+
+    renderExpensesTable(filtered);
+
 }
 
 // Close Budget Modal
